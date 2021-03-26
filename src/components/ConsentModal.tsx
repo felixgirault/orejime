@@ -4,6 +4,7 @@ import Apps from './Apps';
 import Dialog from './Dialog';
 import ConsentManager from '../ConsentManager';
 import {Config, CssNamespace, Translate} from '../types';
+import {template} from '../utils/template';
 
 interface Props {
 	t: Translate;
@@ -67,7 +68,7 @@ export default class ConsentModal extends Component<Props> {
 									</p>
 								)}
 							{t(['consentModal', 'description'])}&nbsp;
-							{t(['consentModal', 'privacyPolicy', 'text'], {
+							{template(t(['consentModal', 'privacyPolicy', 'text']), {
 								privacyPolicy: (
 									<a
 										key="privacyPolicyLink"
