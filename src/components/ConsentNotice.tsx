@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ConsentManager from '../ConsentManager';
 import {Config, CssNamespace, Translate} from '../types';
 import {getPurposes} from '../utils/config';
+import {template} from '../utils/template';
 
 export interface Props {
 	t: Translate;
@@ -70,7 +71,7 @@ export default class ConsentNotice extends Component<Props> {
 						)}
 
 						<p className={ns('Notice-description')}>
-							{t(['consentNotice', 'description'], {
+							{template(t(['consentNotice', 'description']), {
 								purposes: (
 									<strong
 										key="purposes"
@@ -80,7 +81,7 @@ export default class ConsentNotice extends Component<Props> {
 									</strong>
 								)
 							})}
-							{t(['consentNotice', 'privacyPolicy', 'text'], {
+							{template(t(['consentNotice', 'privacyPolicy', 'text']), {
 								privacyPolicy: (
 									<a
 										key="privacyPolicyLink"

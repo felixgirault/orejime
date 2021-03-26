@@ -1,10 +1,7 @@
 export type JsonParser = (json: string) => any;
 export type JsonSerializer = (json: any) => string;
 export type CssNamespace = (className: string) => string;
-export type Translate = (
-	path: string[],
-	variables?: {[name: string]: any}
-) => string;
+export type Translate = (path: string[]) => string;
 
 type AppCookie = [
 	cookiePattern: RegExp,
@@ -69,9 +66,6 @@ export interface ConsentsWatcher {
 	update: (emitter: any, name: string, consents: Consents) => void;
 }
 
-export type TranslationMap = Map<string, string | TranslationMap>;
-export type TranslationObject = {
-	[key: string]: string | TranslationObject;
+export type Translations = {
+	[key: string]: string | Translations;
 };
-
-export type Translations = TranslationMap | TranslationObject;
