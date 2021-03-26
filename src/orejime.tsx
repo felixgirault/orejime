@@ -1,12 +1,12 @@
 import React from 'react';
 import {render} from 'react-dom';
+import assign from 'assign-deep';
 import ConsentManager from './ConsentManager';
 import translations from './translations';
 import Main from './components/Main';
-import {convertToMap, update} from './utils/maps';
 import {t, language} from './utils/i18n';
 import {createCssNamespace} from './utils/css';
-import {Config, Translate, TranslationMap} from './types';
+import {Config} from './types';
 
 function getElement(config: Config) {
 	const {elementID: id, stylePrefix} = config;
@@ -26,10 +26,7 @@ function getElement(config: Config) {
 }
 
 function getTranslations(config: Config) {
-	const trans: TranslationMap = new Map([]);
-	update(trans, convertToMap(translations));
-	update(trans, convertToMap(config.translations));
-	return trans;
+	return assign({}, translations, config.translations);
 }
 
 const managers: {[name: string]: ConsentManager} = {};
@@ -75,12 +72,9 @@ export function init(conf: Config) {
 	const element = getElement(config);
 	const trans = getTranslations(config);
 	const manager = getManager(config);
-	const tt: Translate = (key, ...args) => {
-		return t(trans, config.lang, config.debug, key, ...args) as string;
-	};
 	const app = (render(
 		<Main
-			t={tt}
+			t={t.bind(null, trans, config.lang, config.debug)}
 			ns={createCssNamespace(config.stylePrefix)}
 			manager={manager}
 			config={config}

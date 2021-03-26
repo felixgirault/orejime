@@ -8,8 +8,7 @@ describe('t', () => {
 		translations = {
 			en: {
 				foo: {
-					bar: 'foobar',
-					baz: 'foo {var} baz'
+					bar: 'foobar'
 				}
 			}
 		};
@@ -20,22 +19,10 @@ describe('t', () => {
 	});
 
 	test('undefined key', () => {
-		expect(t(translations, 'en', false, ['baz'])).toEqual(false);
+		expect(t(translations, 'en', false, ['baz'])).toBeUndefined();
 	});
 
 	test('undefined lang', () => {
-		expect(t(translations, 'fr', false, ['foo', 'bar'])).toEqual(false);
-	});
-
-	test('no vars', () => {
-		expect(t(translations, 'en', false, ['foo', 'baz'])).toEqual(
-			'foo {var} baz'
-		);
-	});
-
-	test('vars', () => {
-		expect(
-			t(translations, 'en', false, ['foo', 'baz'], {var: 'bar'})
-		).toEqual(['foo ', 'bar', ' baz']);
+		expect(t(translations, 'fr', false, ['foo', 'bar'])).toBeUndefined();
 	});
 });
