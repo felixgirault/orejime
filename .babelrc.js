@@ -1,6 +1,7 @@
 module.exports = {
   "plugins": [
     "@babel/plugin-transform-runtime",
+    "@babel/plugin-proposal-class-properties",
     "convert-to-json"
   ],
   "presets": [
@@ -11,6 +12,7 @@ module.exports = {
         "firefox": "60" // firefox esr
       }
     }],
-    "@babel/preset-react"
+    "@babel/preset-react",
+    "@babel/preset-typescript"
   ]
 };
