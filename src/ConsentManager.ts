@@ -1,7 +1,23 @@
+import {App, Config, Consents, ConsentsWatcher} from './types';
 import {getCookie, getCookies, setCookie, deleteCookie} from './utils/cookies';
 
+// temporary fix to avoid touching the code for now
+declare global {
+	interface HTMLElement {
+		[attr: string]: any;
+	}
+}
+
 export default class ConsentManager {
-	constructor(config) {
+	public confirmed: boolean;
+	public changed: boolean;
+	public consents: Consents;
+	private config: Config;
+	private states: {[appName: string]: boolean};
+	private executedOnce: {[appName: string]: boolean};
+	private watchers: Set<ConsentsWatcher>;
+
+	constructor(config: Config) {
 		this.config = config; // the configuration
 		this.consents = this.defaultConsents; // the consent states of the configured apps
 		this.confirmed = false; // true if the user actively confirmed his/her consent
@@ -17,21 +33,21 @@ export default class ConsentManager {
 		return this.config.cookieName || 'orejime';
 	}
 
-	watch(watcher) {
+	watch(watcher: ConsentsWatcher) {
 		if (!this.watchers.has(watcher)) this.watchers.add(watcher);
 	}
 
-	unwatch(watcher) {
+	unwatch(watcher: ConsentsWatcher) {
 		if (this.watchers.has(watcher)) this.watchers.delete(watcher);
 	}
 
-	notify(name, data) {
-		this.watchers.forEach((watcher) => {
+	notify(name: string, data: Consents) {
+		this.watchers.forEach((watcher: ConsentsWatcher) => {
 			watcher.update(this, name, data);
 		});
 	}
 
-	getApp(name) {
+	getApp(name: string) {
 		const matchingApps = this.config.apps.filter((app) => {
 			return app.name == name;
 		});
@@ -39,7 +55,7 @@ export default class ConsentManager {
 		return undefined;
 	}
 
-	getDefaultConsent(app) {
+	getDefaultConsent(app: App) {
 		let consent = app.default;
 		if (consent === undefined) consent = this.config.default;
 		if (consent === undefined) consent = false;
@@ -47,8 +63,8 @@ export default class ConsentManager {
 	}
 
 	get defaultConsents() {
-		const consents = {};
-		for (var i = 0; i < this.config.apps.length; i++) {
+		const consents: Consents = {};
+		for (let i = 0; i < this.config.apps.length; i++) {
 			const app = this.config.apps[i];
 			consents[app.name] = this.getDefaultConsent(app);
 		}
@@ -67,7 +83,7 @@ export default class ConsentManager {
 		});
 	}
 
-	updateConsent(app, value) {
+	updateConsent(app: App, value: boolean) {
 		if (app.required && !value) {
 			return;
 		}
@@ -83,7 +99,7 @@ export default class ConsentManager {
 		this.notify('consents', this.consents);
 	}
 
-	getConsent(name) {
+	getConsent(name: string) {
 		return this.consents[name] || false;
 	}
 
@@ -91,14 +107,14 @@ export default class ConsentManager {
 		let complete = true;
 		const appNames = this.config.apps.map((app) => app.name);
 		Object.keys(this.consents).forEach(
-			function (key) {
+			function (key: string) {
 				if (appNames.indexOf(key) === -1) {
 					delete this.consents[key];
 				}
 			}.bind(this)
 		);
 		this.config.apps.forEach(
-			function (app) {
+			function (app: App) {
 				if (typeof this.consents[app.name] === 'undefined') {
 					this.consents[app.name] = this.getDefaultConsent(app);
 					complete = false;
@@ -140,7 +156,7 @@ export default class ConsentManager {
 	}
 
 	applyConsents() {
-		for (var i = 0; i < this.config.apps.length; i++) {
+		for (let i = 0; i < this.config.apps.length; i++) {
 			const app = this.config.apps[i];
 			const state = this.states[app.name];
 			const confirmed =
@@ -157,17 +173,17 @@ export default class ConsentManager {
 		}
 	}
 
-	updateAppElements(app, consent) {
+	updateAppElements(app: App, consent: boolean) {
 		// we make sure we execute this app only once if the option is set
 		if (consent) {
 			if (app.onlyOnce && this.executedOnce[app.name]) return;
 			this.executedOnce[app.name] = true;
 		}
 
-		const elements = document.querySelectorAll(
+		const elements = document.querySelectorAll<HTMLElement>(
 			"[data-name='" + app.name + "']"
 		);
-		for (var i = 0; i < elements.length; i++) {
+		for (let i = 0; i < elements.length; i++) {
 			const element = elements[i];
 
 			const parent = element.parentElement;
@@ -182,14 +198,14 @@ export default class ConsentManager {
 				// we create a new script instead of updating the node in
 				// place, as the script won't start correctly otherwise
 				const newElement = document.createElement('script');
-				for (var key of Object.keys(dataset)) {
+				for (const key of Object.keys(dataset)) {
 					newElement.dataset[key] = dataset[key];
 				}
 				newElement.type = 'opt-in';
 				newElement.innerText = element.innerText;
 				newElement.text = element.text;
 				newElement.class = element.class;
-				newElement.style.cssText = element.style;
+				newElement.style.cssText = (element.style as unknown) as string;
 				newElement.id = element.id;
 				newElement.name = element.name;
 				newElement.defer = element.defer;
@@ -205,7 +221,7 @@ export default class ConsentManager {
 			} else {
 				// all other elements (images etc.) are modified in place...
 				if (consent) {
-					for (var attr of attrs) {
+					for (const attr of attrs) {
 						const attrValue = dataset[attr];
 						if (attrValue === undefined) continue;
 						if (dataset['original' + attr] === undefined)
@@ -223,7 +239,7 @@ export default class ConsentManager {
 							dataset.originalDisplay = element.style.display;
 						element.style.display = 'none';
 					}
-					for (var attr of attrs) {
+					for (const attr of attrs) {
 						const attrValue = dataset[attr];
 						if (attrValue === undefined) continue;
 						if (dataset['original' + attr] !== undefined)
@@ -234,16 +250,16 @@ export default class ConsentManager {
 		}
 	}
 
-	updateAppCookies(app, consent) {
+	updateAppCookies(app: App, consent: boolean) {
 		if (consent) return;
 
-		function escapeRegexStr(str) {
+		function escapeRegexStr(str: string) {
 			return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 		}
 
 		if (app.cookies !== undefined && app.cookies.length > 0) {
 			const cookies = getCookies();
-			for (var i = 0; i < app.cookies.length; i++) {
+			for (let i = 0; i < app.cookies.length; i++) {
 				let cookiePattern = app.cookies[i];
 				let cookiePath, cookieDomain;
 				if (cookiePattern instanceof Array) {
@@ -254,7 +270,7 @@ export default class ConsentManager {
 						'^' + escapeRegexStr(cookiePattern) + '$'
 					);
 				}
-				for (var j = 0; j < cookies.length; j++) {
+				for (let j = 0; j < cookies.length; j++) {
 					const cookie = cookies[j];
 					const match = cookiePattern.exec(cookie.name);
 					if (match !== null) {

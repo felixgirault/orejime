@@ -1,5 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var packageInfo = require('./package.json');
 
@@ -13,7 +14,7 @@ var config = {
   context: SRC_DIR,
   resolve: {
     symlinks: false,
-    extensions: ['.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
       "react": "preact-compat",
       "react-dom": "preact-compat"
@@ -30,7 +31,7 @@ var config = {
         ],
       },
       {
-        test: /\.jsx?/,
+        test: /\.(tsx?|jsx?)/,
         include: [SRC_DIR],
         use: [
           'babel-loader',
@@ -41,20 +42,32 @@ var config = {
             }
           }
         ]
+      },
+      {
+        test: /\.ya?ml$/,
+        include: [SRC_DIR],
+        use: 'yaml-loader',
+        type: 'json'
       }
     ]
   },
   entry: [
-    SRC_DIR + '/orejime.umd.js',
+    SRC_DIR + '/orejime.umd.ts',
   ],
   output: {
     path: BUILD_DIR,
     filename: 'orejime.js',
     library: 'Orejime',
     libraryTarget: 'umd',
-    publicPath: ''
+    libraryExport: 'default',
+    publicPath: '',
   },
   plugins: [
+    new ForkTsCheckerWebpackPlugin({
+      typescript: {
+        configFile: '../tsconfig.json'
+      }
+    }),
     new MiniCssExtractPlugin({
       filename: 'orejime.css'
     }),

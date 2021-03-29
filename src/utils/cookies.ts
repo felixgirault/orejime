@@ -2,7 +2,7 @@ export function getCookies() {
 	const cookieStrings = document.cookie.split(';');
 	const cookies = [];
 	const regex = new RegExp('^\\s*([^=]+)\\s*=\\s*(.*?)$');
-	for (var i = 0; i < cookieStrings.length; i++) {
+	for (let i = 0; i < cookieStrings.length; i++) {
 		const cookieStr = cookieStrings[i];
 		const match = regex.exec(cookieStr);
 		if (match === null) continue;
@@ -14,20 +14,25 @@ export function getCookies() {
 	return cookies;
 }
 
-export function getCookie(name) {
+export function getCookie(name: string) {
 	const cookies = getCookies();
-	for (var i = 0; i < cookies.length; i++) {
+	for (let i = 0; i < cookies.length; i++) {
 		if (cookies[i].name == name) return cookies[i];
 	}
 	return null;
 }
 
-function pair(key, value) {
+function pair(key: string, value: string) {
 	return `${key}=${value}`;
 }
 
 //https://stackoverflow.com/questions/14573223/set-cookie-and-get-cookie-with-javascript
-export function setCookie(name, value = '', days = 0, domain = undefined) {
+export function setCookie(
+	name: string,
+	value = '',
+	days = 0,
+	domain: string = undefined
+) {
 	const cookie = [pair(name, value)];
 
 	if (days) {
@@ -44,7 +49,7 @@ export function setCookie(name, value = '', days = 0, domain = undefined) {
 	document.cookie = cookie.join('; ');
 }
 
-export function deleteCookie(name, path, domain) {
+export function deleteCookie(name: string, path?: string, domain?: string) {
 	let cookieString = `${name}=; Max-Age=-99999999;${
 		path !== undefined ? ` path=${path};` : ` path=/;`
 	}`;
