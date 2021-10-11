@@ -1,84 +1,106 @@
+import ObservableMap from './ConsentMap';
+import ConsentRepository from './ConsentRepository';
 import {App, Config, Consents, ConsentsWatcher} from './types';
-import {getCookie, getCookies, setCookie, deleteCookie} from './utils/cookies';
-
-// temporary fix to avoid touching the code for now
-declare global {
-	interface HTMLElement {
-		[attr: string]: any;
-	}
-}
+import {
+	getDefaultConsent,
+	getDefaultConsents,
+	updateAppCookies,
+	updateAppElements
+} from './utils/apps';
+import {
+	areAllAppsDisabled,
+	areAllAppsEnabled,
+	areAllAppsRequired,
+	getApp
+} from './utils/config';
+import {deprecate} from './utils/lang';
 
 export default class ConsentManager {
-	public confirmed: boolean;
-	public changed: boolean;
-	public consents: Consents;
-	private config: Config;
+	public readonly config: Config;
+	public hasUserConfirmed: boolean;
+	public hasUpdatedApps: boolean;
+	private consentMap: ObservableMap<boolean>;
+	private consentRepository: ConsentRepository;
 	private states: {[appName: string]: boolean};
 	private executedOnce: {[appName: string]: boolean};
 	private watchers: Set<ConsentsWatcher>;
 
 	constructor(config: Config) {
 		this.config = config; // the configuration
-		this.consents = this.defaultConsents; // the consent states of the configured apps
-		this.confirmed = false; // true if the user actively confirmed his/her consent
-		this.changed = false; // true if the app config changed compared to the cookie
+		this.consentMap = new ObservableMap(this.defaultConsents);
+		this.consentRepository = new ConsentRepository(this.consentMap, config);
+		this.hasUserConfirmed = false; // true if the user actively confirmed his/her consent
+		this.hasUpdatedApps = false; // true if the app config changed compared to the cookie
 		this.states = {}; // keep track of the change (enabled, disabled) of individual apps
 		this.executedOnce = {}; //keep track of which apps have been executed at least once
-		this.watchers = new Set([]);
+		this.watchers = new Set();
 		this.loadConsents();
 		this.applyConsents();
+
+		this.consentMap.subscribe(this.notify.bind(this, 'consents'));
+	}
+
+	requiresConsent() {
+		return !this.hasUserConfirmed || this.hasUpdatedApps;
 	}
 
 	get cookieName() {
+		deprecate('ConsentManager::cookieName');
 		return this.config.cookieName || 'orejime';
 	}
 
 	watch(watcher: ConsentsWatcher) {
-		if (!this.watchers.has(watcher)) this.watchers.add(watcher);
+		deprecate('ConsentManager::watch()', 'ConsentMap::subscribe');
+		this.watchers.add(watcher);
 	}
 
 	unwatch(watcher: ConsentsWatcher) {
-		if (this.watchers.has(watcher)) this.watchers.delete(watcher);
+		deprecate('ConsentManager::watch()', 'ConsentMap::unsubscribe');
+		this.watchers.delete(watcher);
 	}
 
 	notify(name: string, data: Consents) {
+		deprecate('ConsentManager::watch()');
 		this.watchers.forEach((watcher: ConsentsWatcher) => {
 			watcher.update(this, name, data);
 		});
 	}
 
 	getApp(name: string) {
-		const matchingApps = this.config.apps.filter((app) => {
-			return app.name == name;
-		});
-		if (matchingApps.length > 0) return matchingApps[0];
-		return undefined;
+		deprecate('ConsentManager::getApp()');
+		return getApp(this.config, name);
+	}
+
+	areAllAppsRequired() {
+		return areAllAppsRequired(this.config);
+	}
+
+	areAllAppsEnabled() {
+		return areAllAppsEnabled(this.config, this.consentMap.getAll());
+	}
+
+	areAllAppsDisabled() {
+		return areAllAppsDisabled(this.config, this.consentMap.getAll());
 	}
 
 	getDefaultConsent(app: App) {
-		let consent = app.default;
-		if (consent === undefined) consent = this.config.default;
-		if (consent === undefined) consent = false;
-		return consent;
+		deprecate('ConsentManager::getDefaultConsent()', 'getDefaultConsent()');
+		return getDefaultConsent(app, this.config.default ?? false);
 	}
 
 	get defaultConsents() {
-		const consents: Consents = {};
-		for (let i = 0; i < this.config.apps.length; i++) {
-			const app = this.config.apps[i];
-			consents[app.name] = this.getDefaultConsent(app);
-		}
-		return consents;
+		deprecate('ConsentManager::defaultConsents', 'getDefaultConsents()');
+		return getDefaultConsents(this.config.apps, this.config.default ?? false);
 	}
 
 	declineAll() {
-		this.config.apps.map((app) => {
+		this.config.apps.forEach((app) => {
 			this.updateConsent(app, false);
 		});
 	}
 
 	acceptAll() {
-		this.config.apps.map((app) => {
+		this.config.apps.forEach((app) => {
 			this.updateConsent(app, true);
 		});
 	}
@@ -87,52 +109,37 @@ export default class ConsentManager {
 		if (app.required && !value) {
 			return;
 		}
-		this.consents[app.name] = value;
-		this.notify('consents', this.consents);
+
+		this.consentMap.set(app.name, value);
 	}
 
 	resetConsent() {
-		this.consents = this.defaultConsents;
-		this.confirmed = false;
+		this.consentMap.reset();
+		this.consentRepository.clear();
 		this.applyConsents();
-		deleteCookie(this.cookieName);
-		this.notify('consents', this.consents);
+		this.hasUserConfirmed = false;
 	}
 
-	getConsent(name: string) {
-		return this.consents[name] || false;
+	getConsent(appName: string) {
+		return this.consentMap.get(appName);
 	}
 
-	_checkConsents() {
-		let complete = true;
-		const appNames = this.config.apps.map((app) => app.name);
-		Object.keys(this.consents).forEach(
-			function (key: string) {
-				if (appNames.indexOf(key) === -1) {
-					delete this.consents[key];
-				}
-			}.bind(this)
-		);
-		this.config.apps.forEach(
-			function (app: App) {
-				if (typeof this.consents[app.name] === 'undefined') {
-					this.consents[app.name] = this.getDefaultConsent(app);
-					complete = false;
-				}
-			}.bind(this)
-		);
-		this.confirmed = complete;
-		if (!complete) this.changed = true;
+	getConsents() {
+		return this.consentMap.getAll();
 	}
 
 	loadConsents() {
-		const consentCookie = getCookie(this.cookieName);
-		if (consentCookie !== null && consentCookie.value !== '') {
-			this.consents = this.config.parseCookie(consentCookie.value);
-			this._checkConsents();
-			this.notify('consents', this.consents);
+		deprecate('ConsentManager::loadConsents()');
+
+		if (!this.consentRepository.load()) {
+			return;
 		}
-		return this.consents;
+
+		this.hasUpdatedApps = this.config.apps.some(
+			({name}) => !this.consentMap.has(name)
+		);
+
+		this.hasUserConfirmed = !this.hasUpdatedApps;
 	}
 
 	saveAndApplyConsents() {
@@ -140,144 +147,50 @@ export default class ConsentManager {
 		this.applyConsents();
 	}
 
+	// private
 	saveConsents() {
-		if (this.consents === null) deleteCookie(this.cookieName);
-		const value = this.config.stringifyCookie(this.consents);
-
-		setCookie(
-			this.cookieName,
-			value,
-			this.config.cookieExpiresAfterDays || 120,
-			this.config.cookieDomain
-		);
-
-		this.confirmed = true;
-		this.changed = false;
+		this.consentRepository.commit();
+		this.hasUserConfirmed = true;
 	}
 
+	// private
 	applyConsents() {
-		for (let i = 0; i < this.config.apps.length; i++) {
-			const app = this.config.apps[i];
+		this.config.apps.forEach((app) => {
 			const state = this.states[app.name];
 			const confirmed =
-				this.confirmed ||
-				(app.optOut !== undefined
-					? app.optOut
-					: this.config.optOut || false);
-			const consent = this.getConsent(app.name) && confirmed;
-			if (state === consent) continue;
+				this.hasUserConfirmed || (app.optOut ?? this.config.optOut);
+			const consent = confirmed && this.getConsent(app.name);
+
+			if (state === consent) {
+				return;
+			}
+
 			this.updateAppElements(app, consent);
 			this.updateAppCookies(app, consent);
-			if (app.callback !== undefined) app.callback(consent, app);
+
+			if (app.callback !== undefined) {
+				app.callback(consent, app);
+			}
+
 			this.states[app.name] = consent;
-		}
+		});
 	}
 
-	updateAppElements(app: App, consent: boolean) {
-		// we make sure we execute this app only once if the option is set
+	updateAppElements({name, onlyOnce}: App, consent: boolean) {
 		if (consent) {
-			if (app.onlyOnce && this.executedOnce[app.name]) return;
-			this.executedOnce[app.name] = true;
-		}
-
-		const elements = document.querySelectorAll<HTMLElement>(
-			"[data-name='" + app.name + "']"
-		);
-		for (let i = 0; i < elements.length; i++) {
-			const element = elements[i];
-
-			const parent = element.parentElement;
-			const {dataset} = element;
-			const {type, name} = dataset;
-			const attrs = ['href', 'src'];
-
-			//if no consent was given we disable this tracker
-			//we remove and add it again to trigger a re-execution
-
-			if (element.tagName == 'SCRIPT') {
-				// we create a new script instead of updating the node in
-				// place, as the script won't start correctly otherwise
-				const newElement = document.createElement('script');
-				for (const key of Object.keys(dataset)) {
-					newElement.dataset[key] = dataset[key];
-				}
-				newElement.type = 'opt-in';
-				newElement.innerText = element.innerText;
-				newElement.text = element.text;
-				newElement.class = element.class;
-				newElement.style.cssText = (element.style as unknown) as string;
-				newElement.id = element.id;
-				newElement.name = element.name;
-				newElement.defer = element.defer;
-				newElement.async = element.async;
-
-				if (consent) {
-					newElement.type = type;
-					if (dataset.src !== undefined) newElement.src = dataset.src;
-				}
-				//we remove the original element and insert a new one
-				parent.insertBefore(newElement, element);
-				parent.removeChild(element);
-			} else {
-				// all other elements (images etc.) are modified in place...
-				if (consent) {
-					for (const attr of attrs) {
-						const attrValue = dataset[attr];
-						if (attrValue === undefined) continue;
-						if (dataset['original' + attr] === undefined)
-							dataset['original' + attr] = element[attr];
-						element[attr] = attrValue;
-					}
-					if (dataset.title !== undefined) element.title = dataset.title;
-					if (dataset.originalDisplay !== undefined)
-						element.style.display = dataset.originalDisplay;
-				} else {
-					if (dataset.title !== undefined)
-						element.removeAttribute('title');
-					if (dataset.hide === 'true') {
-						if (dataset.originalDisplay === undefined)
-							dataset.originalDisplay = element.style.display;
-						element.style.display = 'none';
-					}
-					for (const attr of attrs) {
-						const attrValue = dataset[attr];
-						if (attrValue === undefined) continue;
-						if (dataset['original' + attr] !== undefined)
-							element[attr] = dataset['original' + attr];
-					}
-				}
+			if (onlyOnce && this.executedOnce[name]) {
+				return;
 			}
+
+			this.executedOnce[name] = true;
 		}
+
+		updateAppElements(name, consent);
 	}
 
-	updateAppCookies(app: App, consent: boolean) {
-		if (consent) return;
-
-		function escapeRegexStr(str: string) {
-			return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-		}
-
-		if (app.cookies !== undefined && app.cookies.length > 0) {
-			const cookies = getCookies();
-			for (let i = 0; i < app.cookies.length; i++) {
-				let cookiePattern = app.cookies[i];
-				let cookiePath, cookieDomain;
-				if (cookiePattern instanceof Array) {
-					[cookiePattern, cookiePath, cookieDomain] = cookiePattern;
-				}
-				if (!(cookiePattern instanceof RegExp)) {
-					cookiePattern = new RegExp(
-						'^' + escapeRegexStr(cookiePattern) + '$'
-					);
-				}
-				for (let j = 0; j < cookies.length; j++) {
-					const cookie = cookies[j];
-					const match = cookiePattern.exec(cookie.name);
-					if (match !== null) {
-						deleteCookie(cookie.name, cookiePath, cookieDomain);
-					}
-				}
-			}
+	updateAppCookies({cookies}: App, consent: boolean) {
+		if (!consent && cookies && cookies.length) {
+			updateAppCookies(cookies);
 		}
 	}
 }

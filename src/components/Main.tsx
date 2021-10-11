@@ -1,118 +1,91 @@
-import React, {Component} from 'react';
-import ConsentNoticeWrapper from './ConsentNoticeWrapper';
+import React, {
+	forwardRef,
+	ForwardRefRenderFunction,
+	Ref,
+	useContext,
+	useImperativeHandle,
+	useState
+} from 'react';
 import ConsentModal from './ConsentModal';
-import ConsentManager from '../ConsentManager';
-import {Config, CssNamespace, Translate} from '../types';
+import ConsentNoticeWrapper from './ConsentNoticeWrapper';
+import {InstanceContext} from './InstanceContext';
+
+interface Handle {
+	openModal: () => void;
+}
 
 interface Props {
-	t: Translate;
-	ns: CssNamespace;
-	config: Config;
-	manager: ConsentManager;
+	ref: Ref<any>;
 }
 
-interface State {
-	isModalVisible: boolean;
-}
+const Main: ForwardRefRenderFunction<Handle, Props> = (_, ref) => {
+	const {ns, config, manager} = useContext(InstanceContext);
 
-export default class Main extends Component<Props, State> {
-	constructor(props: Props) {
-		super(props);
-		this.state = {
-			isModalVisible: this.isModalVisible()
-		};
-		this.showModal = this.showModal.bind(this);
-		this.hideModal = this.hideModal.bind(this);
-		this.saveAndHideAll = this.saveAndHideAll.bind(this);
-		this.declineAndHideAll = this.declineAndHideAll.bind(this);
-		this.acceptAndHideAll = this.acceptAndHideAll.bind(this);
-	}
+	const shouldShowModal = () =>
+		config.mustConsent && manager.requiresConsent();
 
-	isModalVisible(userRequest?: boolean) {
-		const {config, manager} = this.props;
-		if (userRequest) {
-			return true;
-		}
-		if (config.mustConsent && (!manager.confirmed || manager.changed)) {
-			return true;
-		}
-		return false;
-	}
+	const isNoticeVisible = () =>
+		config.mustConsent || config.noNotice ? false : manager.requiresConsent();
 
-	isNoticeVisible() {
-		const {config, manager} = this.props;
-		if (config.mustConsent || config.noNotice) {
-			return false;
-		}
-		if (manager.confirmed && !manager.changed) {
-			return false;
-		}
-		return true;
-	}
+	const [isModalOpen, setModalOpen] = useState(shouldShowModal());
 
-	showModal(e?: Event) {
-		if (e !== undefined) {
-			e.preventDefault();
-		}
-		this.setState({isModalVisible: this.isModalVisible(true)});
-	}
+	// used to trigger a rerender so the component gets the
+	// current value of manager.requiresConsent()
+	//
+	// /!\ FIND A WAY TO OBSERVE THE VALUE INSTEAD
+	//
+	const [, rerender] = useState<object>();
 
-	hideModal(e?: Event) {
-		if (e !== undefined) {
-			e.preventDefault();
-		}
-		this.setState({isModalVisible: this.isModalVisible(false)});
-	}
+	const openModal = () => {
+		setModalOpen(true);
+	};
 
-	saveAndHideAll(e?: Event) {
-		if (e !== undefined) {
-			e.preventDefault();
-		}
-		this.props.manager.saveAndApplyConsents();
-		this.setState({isModalVisible: this.isModalVisible(false)});
-	}
+	const closeModal = () => {
+		setModalOpen(shouldShowModal());
+		rerender({});
+	};
 
-	declineAndHideAll() {
-		this.props.manager.declineAll();
-		this.props.manager.saveAndApplyConsents();
-		this.setState({isModalVisible: this.isModalVisible(false)});
-	}
+	const save = () => {
+		manager.saveAndApplyConsents();
+		closeModal();
+	};
 
-	acceptAndHideAll() {
-		this.props.manager.acceptAll();
-		this.props.manager.saveAndApplyConsents();
-		this.setState({isModalVisible: this.isModalVisible(false)});
-	}
+	const declineAll = () => {
+		manager.declineAll();
+		manager.saveAndApplyConsents();
+		closeModal();
+	};
 
-	render() {
-		const {config, t, manager, ns} = this.props;
-		const isNoticeVisible = this.isNoticeVisible();
-		return (
-			<div className={ns('Main')}>
-				<ConsentNoticeWrapper
-					key="notice"
-					t={t}
-					ns={ns}
-					isVisible={isNoticeVisible}
-					isMandatory={config.mustNotice || false}
-					isModalVisible={this.state.isModalVisible}
-					config={config}
-					manager={manager}
-					onSaveRequest={this.acceptAndHideAll}
-					onDeclineRequest={this.declineAndHideAll}
-					onConfigRequest={this.showModal}
-				/>
-				<ConsentModal
-					key="modal"
-					isOpen={this.state.isModalVisible}
-					t={t}
-					ns={ns}
-					config={config}
-					onHideRequest={this.hideModal}
-					onSaveRequest={this.saveAndHideAll}
-					manager={manager}
-				/>
-			</div>
-		);
-	}
-}
+	const acceptAll = () => {
+		manager.acceptAll();
+		manager.saveAndApplyConsents();
+		closeModal();
+	};
+
+	// makes openModal() available from the outside
+	useImperativeHandle(ref, () => ({
+		openModal
+	}));
+
+	return (
+		<div className={ns('Main')}>
+			<ConsentNoticeWrapper
+				key="notice"
+				isOpen={isNoticeVisible()}
+				isModalOpen={isModalOpen}
+				onSaveRequest={acceptAll}
+				onDeclineRequest={declineAll}
+				onConfigRequest={openModal}
+			/>
+
+			<ConsentModal
+				key="modal"
+				isOpen={isModalOpen}
+				onHideRequest={closeModal}
+				onSaveRequest={save}
+			/>
+		</div>
+	);
+};
+
+export default forwardRef(Main);

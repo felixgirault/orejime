@@ -1,42 +1,37 @@
-import React, {Component} from 'react';
-import Dialog from './Dialog';
+import React, {useContext} from 'react';
 import ConsentNotice, {Props as ConsentNoticeProps} from './ConsentNotice';
-import {Config, CssNamespace, Translate} from '../types';
-import ConsentManager from '../ConsentManager';
+import Dialog from './Dialog';
+import {InstanceContext} from './InstanceContext';
 
 interface Props extends ConsentNoticeProps {
-	t: Translate;
-	ns: CssNamespace;
-	config: Config;
-	manager: ConsentManager;
-	isVisible: boolean;
-	isMandatory: boolean;
+	isOpen: boolean;
 }
 
-export default class ConsentNoticeWrapper extends Component<Props> {
-	render() {
-		const {isVisible, ...props} = this.props;
-		if (!this.props.isMandatory && !isVisible) {
-			return null;
-		}
-		const title = this.props.t(['consentNotice', 'title']);
-		const ariaProp = title
-			? {aria: {'labelledby': 'orejime-notice-title'}}
-			: {};
-		if (this.props.isMandatory) {
-			return (
-				<Dialog
-					isOpen={isVisible}
-					{...ariaProp}
-					config={this.props.config}
-					portalClassName={this.props.ns('NoticePortal')}
-					overlayClassName={this.props.ns('NoticeOverlay')}
-					className={this.props.ns('NoticeWrapper')}
-				>
-					<ConsentNotice {...props} />
-				</Dialog>
-			);
-		}
-		return <ConsentNotice {...props} />;
+export default function ConsentNoticeWrapper(props: Props) {
+	const {t, ns, config} = useContext(InstanceContext);
+	const {isOpen, ...noticeProps} = props;
+
+	if (!config.mustNotice && !isOpen) {
+		return null;
 	}
+
+	const title = t(['consentNotice', 'title']);
+
+	if (config.mustNotice) {
+		return (
+			<Dialog
+				isOpen={isOpen}
+				elementId={config.elementID}
+				appElement={config.appElement}
+				portalClassName={ns('NoticePortal')}
+				overlayClassName={ns('NoticeOverlay')}
+				className={ns('NoticeWrapper')}
+				aria-labelledby={title || undefined}
+			>
+				<ConsentNotice {...noticeProps} />
+			</Dialog>
+		);
+	}
+
+	return <ConsentNotice {...noticeProps} />;
 }

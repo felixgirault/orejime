@@ -1,12 +1,9 @@
-import React from 'react';
-import {CssNamespace, Translate} from '../types';
+import React, {useContext} from 'react';
+import {InstanceContext} from './InstanceContext';
 
-interface Props {
-	t: Translate;
-	ns: CssNamespace;
-}
+export const Close = () => {
+	const {t, ns} = useContext(InstanceContext);
 
-export const Close = ({t, ns}: Props) => {
 	return (
 		<svg
 			role="img"

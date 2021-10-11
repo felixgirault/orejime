@@ -1,68 +1,43 @@
-export function getCookies() {
-	const cookieStrings = document.cookie.split(';');
-	const cookies = [];
-	const regex = new RegExp('^\\s*([^=]+)\\s*=\\s*(.*?)$');
-	for (let i = 0; i < cookieStrings.length; i++) {
-		const cookieStr = cookieStrings[i];
-		const match = regex.exec(cookieStr);
-		if (match === null) continue;
-		cookies.push({
-			name: match[1],
-			value: match[2]
-		});
-	}
-	return cookies;
-}
+import Cookie from 'js-cookie';
 
-export function getCookie(name: string) {
-	const cookies = getCookies();
-	for (let i = 0; i < cookies.length; i++) {
-		if (cookies[i].name == name) return cookies[i];
-	}
-	return null;
-}
+export const getCookieNames = () =>
+	document.cookie.split(';').reduce((names, cookie) => {
+		const [name] = cookie.split('=', 2);
+		return name ? names.concat(name.trim()) : names;
+	}, []);
 
-function pair(key: string, value: string) {
-	return `${key}=${value}`;
-}
+export const getCookie = (name: string) => Cookie.get(name);
 
-//https://stackoverflow.com/questions/14573223/set-cookie-and-get-cookie-with-javascript
-export function setCookie(
+export const setCookie = (
 	name: string,
 	value = '',
 	days = 0,
-	domain: string = undefined
-) {
-	const cookie = [pair(name, value)];
+	domain?: string
+) => {
+	Cookie.set(name, value, {
+		expires: days,
+		domain
+	});
+};
 
-	if (days) {
-		const date = new Date();
-		date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-		cookie.push(pair('expires', date.toUTCString()));
-	}
-
+export const deleteCookie = (name: string, path?: string, domain?: string) => {
 	if (domain) {
-		cookie.push(pair('domain', domain));
-	}
+		Cookie.remove(name, {
+			path,
+			domain
+		});
 
-	cookie.push(pair('path', '/'));
-	document.cookie = cookie.join('; ');
-}
-
-export function deleteCookie(name: string, path?: string, domain?: string) {
-	let cookieString = `${name}=; Max-Age=-99999999;${
-		path !== undefined ? ` path=${path};` : ` path=/;`
-	}`;
-	if (domain !== undefined) {
-		document.cookie = `${cookieString} domain=${domain};`;
 		return;
 	}
+
 	// if domain is not defined, try to delete cookie on multiple default domains
-	document.cookie = cookieString;
-	document.cookie = `${cookieString} domain=.${location.hostname};`;
-	// handle subdomains
-	document.cookie = `${cookieString} domain=.${location.hostname
-		.split('.')
-		.slice(-2)
-		.join('.')};`;
-}
+	Cookie.remove(name, {
+		path,
+		domain: location.hostname
+	});
+
+	Cookie.remove(name, {
+		path,
+		domain: location.hostname.split('.').slice(-2).join('.')
+	});
+};

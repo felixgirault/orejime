@@ -1,12 +1,7 @@
-import React, {createRef, ElementRef} from 'react';
-import {render} from 'react-dom';
-import {InstanceContext} from './components/InstanceContext';
-import Main from './components/Main';
 import {acquireManager} from './managerPool';
 import {Config} from './types';
-import {getElement, getTranslations, validate} from './utils/config';
-import {createCssNamespace} from './utils/css';
-import {language, t} from './utils/i18n';
+import {validate} from './utils/config';
+import {language} from './utils/i18n';
 
 export const defaultConfig: Config = {
 	elementID: 'orejime',
@@ -35,30 +30,18 @@ export function init(conf: Config) {
 		return;
 	}
 
-	const element = getElement(config);
-	const trans = getTranslations(config);
 	const manager = acquireManager(config);
-	const appRef = createRef<ElementRef<typeof Main>>();
-	const app = render(
-		<InstanceContext.Provider
-			value={{
-				config,
-				manager,
-				t: t.bind(null, trans, config.lang, config.debug),
-				ns: createCssNamespace(config.stylePrefix)
-			}}
-		>
-			<Main ref={appRef} />
-		</InstanceContext.Provider>,
-		element
-	);
+
+	if (!manager.requiresConsent()) {
+		return;
+	}
 
 	return {
-		show: appRef.current.openModal,
+		//show: appRef.current.openModal,
 		internals: {
 			config,
 			manager,
-			react: app
+			//react: app
 		}
 	};
 }
