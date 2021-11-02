@@ -9,3 +9,6 @@ export function deprecate(name: string, replacement?: string) {
 	);
 	*/
 }
+
+export const uniq = <T>(array: T[]) =>
+	Array.from(new Set(array));

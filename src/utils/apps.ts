@@ -1,6 +1,6 @@
 import {App, AppCookie, Consents} from '../types';
 import {deleteCookie, getCookieNames} from './cookies';
-import {escapeRegex} from './lang';
+import {escapeRegex, uniq} from './lang';
 
 // temporary fix to avoid touching the code for now
 declare global {
@@ -24,6 +24,30 @@ export const getDefaultConsents = (apps: App[], defaultConsent: boolean) =>
 		}),
 		{} as Consents
 	);
+
+export const getApp = (apps: App[], appName: string) =>
+	apps.find((app) => app.name === appName);
+
+export const getPurposes = (apps: App[]) =>
+	uniq(apps.reduce((all, {purposes}) => all.concat(purposes || []), []));
+
+export const areAllAppsRequired = (apps: App[]) => {
+	const isAnyAppOptional = apps.some(({required}) => !required);
+	return !isAnyAppOptional;
+};
+
+export const areAllAppsEnabled = (apps: App[], consents: Consents) => {
+	const isAnyAppDisabled = apps.some(({name}) => !consents[name]);
+	return !isAnyAppDisabled;
+};
+
+export const areAllAppsDisabled = (apps: App[], consents: Consents) => {
+	const isAnyAppEnabled = apps.some(
+		({name, required}) => required || consents[name]
+	);
+
+	return !isAnyAppEnabled;
+};
 
 const updateScriptElement = (element: HTMLScriptElement, consent: boolean) => {
 	if (!consent) {

@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
-import {getPurposes, getLogoAlternative, getLogoUrl} from '../utils/config';
+import {getPurposes} from '../utils/apps';
+import {getLogoAlternative, getLogoUrl} from '../utils/config';
 import {template} from '../utils/template';
 import {InstanceContext} from './InstanceContext';
 
@@ -18,7 +19,7 @@ export default function ConsentNotice({
 }: Props) {
 	const {t, ns, config, manager} = useContext(InstanceContext);
 	const title = t(['consentNotice', 'title']);
-	const purposes = getPurposes(config);
+	const purposes = getPurposes(config.apps);
 	const purposesText = purposes
 		.map((purpose) => t(['purposes', purpose]))
 		.join(', ');

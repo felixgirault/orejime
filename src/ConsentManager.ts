@@ -2,17 +2,15 @@ import ObservableMap from './ConsentMap';
 import ConsentRepository from './ConsentRepository';
 import {App, Config, Consents, ConsentsWatcher} from './types';
 import {
+	areAllAppsDisabled,
+	areAllAppsEnabled,
+	areAllAppsRequired,
+	getApp,
 	getDefaultConsent,
 	getDefaultConsents,
 	updateAppCookies,
 	updateAppElements
 } from './utils/apps';
-import {
-	areAllAppsDisabled,
-	areAllAppsEnabled,
-	areAllAppsRequired,
-	getApp
-} from './utils/config';
 import {deprecate} from './utils/lang';
 
 export default class ConsentManager {
@@ -68,19 +66,19 @@ export default class ConsentManager {
 
 	getApp(name: string) {
 		deprecate('ConsentManager::getApp()');
-		return getApp(this.config, name);
+		return getApp(this.config.apps, name);
 	}
 
 	areAllAppsRequired() {
-		return areAllAppsRequired(this.config);
+		return areAllAppsRequired(this.config.apps);
 	}
 
 	areAllAppsEnabled() {
-		return areAllAppsEnabled(this.config, this.consentMap.getAll());
+		return areAllAppsEnabled(this.config.apps, this.consentMap.getAll());
 	}
 
 	areAllAppsDisabled() {
-		return areAllAppsDisabled(this.config, this.consentMap.getAll());
+		return areAllAppsDisabled(this.config.apps, this.consentMap.getAll());
 	}
 
 	getDefaultConsent(app: App) {
