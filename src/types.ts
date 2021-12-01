@@ -68,9 +68,9 @@ export interface Consents {
 	[appName: string]: boolean;
 }
 
-export interface ConsentsWatcher {
+export type ConsentsWatcher = {
 	update: (emitter: any, name: string, consents: Consents) => void;
-}
+};
 
 export type Translations = {
 	[key: string]: string | Translations;

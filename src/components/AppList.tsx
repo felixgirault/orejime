@@ -1,36 +1,26 @@
 import React, {useContext} from 'react';
-import {App, Consents, CssNamespace, Translate} from '../types';
+import {App, Consents} from '../types';
 import AppItem from './AppItem';
 import {InstanceContext} from './InstanceContext';
 
 interface Props {
 	apps: App[];
-	consents: Consents;
-	onToggle: (app: App, checked: boolean) => void;
+	defaultConsents: Consents;
 }
 
-const AppList = ({apps, consents, onToggle}: Props) => {
-	const {t, ns} = useContext(InstanceContext);
+const AppList = ({apps, defaultConsents}: Props) => {
+	const {ns} = useContext(InstanceContext);
 
 	return (
 		<ul className={ns('AppList')}>
-			{apps.map((app) => {
-				const checked = consents[app.name];
-				const handleToggle = (value: boolean) => onToggle(app, value);
-
-				return (
-					<li
-						key={`app-${app.name}`}
-						className={ns(`AppList-item AppList-item--${app.name}`)}
-					>
-						<AppItem
-							checked={checked || app.required}
-							onToggle={handleToggle}
-							{...app}
-						/>
-					</li>
-				);
-			})}
+			{apps.map((app) => (
+				<li
+					key={`app-${app.name}`}
+					className={ns(`AppList-item AppList-item--${app.name}`)}
+				>
+					<AppItem app={app} defaultChecked={defaultConsents[app.name]} />
+				</li>
+			))}
 		</ul>
 	);
 };

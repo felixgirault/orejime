@@ -49,6 +49,9 @@ export const areAllAppsDisabled = (apps: App[], consents: Consents) => {
 	return !isAnyAppEnabled;
 };
 
+const backupName = (attribute: string) =>
+	`orejime-${attribute}`;
+
 const updateScriptElement = (element: HTMLScriptElement, consent: boolean) => {
 	if (!consent) {
 		element.type = 'opt-in';
@@ -66,13 +69,14 @@ const updateScriptElement = (element: HTMLScriptElement, consent: boolean) => {
 	clone.src = element.dataset.src;
 
 	const parent = element.parentElement;
-	parent.removeChild(element);
 	parent.insertBefore(clone, element);
+	parent.removeChild(element);
 };
 
 const updateDomElement = (element: HTMLElement, consent: boolean) => {
 	const {dataset} = element;
 	const attrs = ['href', 'src'];
+	const backupDisplay = backupName('display');
 
 	if (consent) {
 		for (const attr of attrs) {
@@ -82,28 +86,41 @@ const updateDomElement = (element: HTMLElement, consent: boolean) => {
 				continue;
 			}
 
-			if (dataset['original' + attr] === undefined) {
-				dataset['original' + attr] = element[attr];
+			if (dataset[backupName(attr)] === undefined) {
+				dataset[backupName(attr)] = element[attr];
 			}
 
 			element[attr] = attrValue;
 		}
 
-		if (dataset.title !== undefined) element.title = dataset.title;
-		if (dataset.originalDisplay !== undefined)
-			element.style.display = dataset.originalDisplay;
+		if ('title' in dataset) {
+			element.title = dataset.title;
+		}
+
+		if (backupDisplay in dataset) {
+			element.style.display = dataset[backupDisplay];
+		}
 	} else {
-		if (dataset.title !== undefined) element.removeAttribute('title');
+		element.removeAttribute('title');
+
 		if (dataset.hide === 'true') {
-			if (dataset.originalDisplay === undefined)
-				dataset.originalDisplay = element.style.display;
+			if (backupDisplay in dataset) {
+				dataset[backupDisplay] = element.style.display;
+			}
+
 			element.style.display = 'none';
 		}
+
 		for (const attr of attrs) {
 			const attrValue = dataset[attr];
-			if (attrValue === undefined) continue;
-			if (dataset['original' + attr] !== undefined)
-				element[attr] = dataset['original' + attr];
+
+			if (attrValue === undefined) {
+				continue;
+			}
+
+			if (backupName(attr) in dataset) {
+				element[attr] = dataset[backupName(attr)];
+			}
 		}
 	}
 };
@@ -121,6 +138,7 @@ const updateAppElement = (element: HTMLElement, consent: boolean) => {
 
 export function updateAppElements(name: string, consent: boolean) {
 	document
+		// TODO namespace orejime-x
 		.querySelectorAll<HTMLElement>(`[data-name="${name}"]`)
 		.forEach((element) => {
 			updateAppElement(element, consent);

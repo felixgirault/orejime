@@ -1,4 +1,5 @@
 import React, {useContext} from 'react';
+import useIsDirty from '../hooks/useIsDirty';
 import {getPurposes} from '../utils/apps';
 import {getLogoAlternative, getLogoUrl} from '../utils/config';
 import {template} from '../utils/template';
@@ -6,18 +7,19 @@ import {InstanceContext} from './InstanceContext';
 
 export interface Props {
 	isModalOpen: boolean;
-	onSaveRequest: () => void;
-	onDeclineRequest: () => void;
-	onConfigRequest: () => void;
+	onAcceptAll: () => void;
+	onDeclineAll: () => void;
+	onConfigure: () => void;
 }
 
 export default function ConsentNotice({
 	isModalOpen,
-	onSaveRequest,
-	onDeclineRequest,
-	onConfigRequest
+	onAcceptAll,
+	onDeclineAll,
+	onConfigure
 }: Props) {
 	const {t, ns, config, manager} = useContext(InstanceContext);
+	const isDirty = useIsDirty(manager);
 	const title = t(['consentNotice', 'title']);
 	const purposes = getPurposes(config.apps);
 	const purposesText = purposes
@@ -74,7 +76,7 @@ export default function ConsentNotice({
 					</p>
 				</div>
 
-				{manager.hasUpdatedApps && (
+				{isDirty && (
 					<p className={ns('Notice-changes')}>
 						{t(['consentNotice', 'changeDescription'])}
 					</p>
@@ -88,7 +90,7 @@ export default function ConsentNotice({
 							)}
 							type="button"
 							title={t(['acceptTitle']) as string}
-							onClick={onSaveRequest}
+							onClick={onAcceptAll}
 						>
 							{t(['accept'])}
 						</button>
@@ -102,7 +104,7 @@ export default function ConsentNotice({
 								'Button Button--decline Notice-button Notice-declineButton'
 							)}
 							type="button"
-							onClick={onDeclineRequest}
+							onClick={onDeclineAll}
 						>
 							{t(['decline'])}
 						</button>
@@ -114,7 +116,7 @@ export default function ConsentNotice({
 							className={ns(
 								'Button Button--info Notice-learnMoreButton'
 							)}
-							onClick={onConfigRequest}
+							onClick={onConfigure}
 						>
 							{t(['consentNotice', 'learnMore'])}
 						</button>

@@ -2,27 +2,24 @@ import React, {ChangeEvent, useContext} from 'react';
 import {App} from '../types';
 import {InstanceContext} from './InstanceContext';
 
-interface Props extends App {
-	checked: boolean;
-	onToggle: (checked: boolean) => void;
+interface Props {
+	app: App;
+	defaultChecked: boolean;
 }
 
-export default function AppItem({
-	checked,
-	onToggle,
-	name,
-	title,
-	description,
-	required = false,
-	optOut = false,
-	purposes = []
-}: Props) {
+export default function AppItem({app, defaultChecked}: Props) {
 	const {t, ns} = useContext(InstanceContext);
+	const {
+		name,
+		title,
+		description,
+		required = false,
+		optOut = false,
+		purposes = []
+	} = app;
+
 	const id = `orejime-app-item-${name}`;
-	const isChecked = checked || required;
-	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-		onToggle(e.target.checked);
-	};
+	const isChecked = required || defaultChecked;
 
 	return (
 		<div className={ns('AppItem')}>
@@ -33,7 +30,6 @@ export default function AppItem({
 				disabled={required}
 				checked={isChecked}
 				type="checkbox"
-				onChange={handleChange}
 			/>
 
 			<label

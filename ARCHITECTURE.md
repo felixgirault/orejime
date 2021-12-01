@@ -1,8 +1,19 @@
+# TODO
+
+* add a css classmap to allow for restyles
+* remove categories and use purposes
+* rename app => tracker
+
+# Done
+
+public interface : resetConsent => resetConsents
+
 # Specs
 
 https://www.cnil.fr/sites/default/files/atoms/files/recommandation-cookies-et-autres-traceurs.pdf
 
 ## Usage
+
 
 * prompt
   * accept

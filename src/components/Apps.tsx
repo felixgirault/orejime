@@ -1,24 +1,22 @@
 import React, {useContext} from 'react';
-import useConsents from '../hooks/useConsents';
 import AppList from './AppList';
 import CategorizedAppList from './CategorizedAppList';
 import {InstanceContext} from './InstanceContext';
 
 export default function Apps() {
 	const {t, ns, config, manager} = useContext(InstanceContext);
-	const consents = useConsents(manager);
 	const {apps, categories} = config;
 
 	return (
 		<div>
-			{manager.areAllAppsRequired() ? null : (
+			{manager.areAllTrackersMandatory() ? null : (
 				<div className={ns('AppToggles')}>
 					<button
 						type="button"
 						className={ns(
 							'Button Button--info AppToggles-button AppToggles-enableAll'
 						)}
-						disabled={manager.areAllAppsEnabled()}
+						disabled={manager.areAllTrackersEnabled()}
 						onClick={manager.acceptAll.bind(manager)}
 					>
 						{t(['acceptAll'])}
@@ -29,7 +27,7 @@ export default function Apps() {
 						className={ns(
 							'Button Button--info AppToggles-button AppToggles-disableAll'
 						)}
-						disabled={manager.areAllAppsDisabled()}
+						disabled={manager.areAllTrackersDisabled()}
 						onClick={manager.declineAll.bind(manager)}
 					>
 						{t(['declineAll'])}
@@ -41,15 +39,10 @@ export default function Apps() {
 				<CategorizedAppList
 					categories={categories}
 					apps={apps}
-					consents={consents}
-					onToggle={manager.updateConsent.bind(manager)}
+					defaultConsents={manager.getAllConsents()}
 				/>
 			) : (
-				<AppList
-					apps={apps}
-					consents={consents}
-					onToggle={manager.updateConsent.bind(manager)}
-				/>
+				<AppList apps={apps} defaultConsents={manager.getAllConsents()} />
 			)}
 		</div>
 	);

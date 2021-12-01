@@ -1,4 +1,6 @@
 import React, {FormEvent, useContext} from 'react';
+import ConsentsMap from '../core/ConsentsMap';
+import useIsDirty from '../hooks/useIsDirty';
 import {template} from '../utils/template';
 import Apps from './Apps';
 import Dialog from './Dialog';
@@ -7,19 +9,26 @@ import {InstanceContext} from './InstanceContext';
 
 interface Props {
 	isOpen: boolean;
-	onHideRequest: () => void;
-	onSaveRequest: () => void;
+	onClose: () => void;
+	onSave: (consents: ConsentsMap) => void;
 }
 
-export default function ConsentModal({
-	isOpen,
-	onHideRequest,
-	onSaveRequest
-}: Props) {
+export default function ConsentModal({isOpen, onClose, onSave}: Props) {
 	const {t, ns, config, manager} = useContext(InstanceContext);
-	const isAlert = config.mustConsent && manager.requiresConsent();
+	const isDirty = useIsDirty(manager);
+	const isAlert = config.mustConsent && isDirty;
 	const handleSubmit = (event: FormEvent) => {
 		event.preventDefault();
+
+		//
+		//
+		//
+		//SERIALIZE
+		//
+		//
+		//
+
+		onSave({});
 	};
 
 	return (
@@ -31,7 +40,7 @@ export default function ConsentModal({
 			className={ns('ModalWrapper')}
 			elementId={config.elementID}
 			appElement={config.appElement}
-			onRequestClose={onHideRequest}
+			onRequestClose={onClose}
 			role={isAlert ? 'alertdialog' : 'dialog'}
 		>
 			<div className={ns('Modal')}>
@@ -41,7 +50,7 @@ export default function ConsentModal({
 							title={t(['close'])}
 							className={ns('Modal-closeButton')}
 							type="button"
-							onClick={onHideRequest}
+							onClick={onClose}
 						>
 							<Close />
 						</button>
@@ -51,14 +60,13 @@ export default function ConsentModal({
 						{t(['consentModal', 'title'])}
 					</h1>
 					<p className={ns('Modal-description')}>
-						{manager.hasUpdatedApps &&
-							(config.mustConsent || config.noNotice) && (
-								<p className={ns('Modal-description')}>
-									<strong className={ns('Modal-changes')}>
-										{t(['consentNotice', 'changeDescription'])}
-									</strong>
-								</p>
-							)}
+						{isDirty && (config.mustConsent || config.noNotice) && (
+							<p className={ns('Modal-description')}>
+								<strong className={ns('Modal-changes')}>
+									{t(['consentNotice', 'changeDescription'])}
+								</strong>
+							</p>
+						)}
 						{t(['consentModal', 'description'])}&nbsp;
 						{template(t(['consentModal', 'privacyPolicy', 'text']), {
 							privacyPolicy: (
@@ -66,7 +74,7 @@ export default function ConsentModal({
 									key="privacyPolicyLink"
 									className={ns('Modal-privacyPolicyLink')}
 									onClick={(e) => {
-										onHideRequest();
+										onClose();
 									}}
 									href={config.privacyPolicy}
 								>
@@ -85,7 +93,7 @@ export default function ConsentModal({
 					<div className={ns('Modal-footer')}>
 						<button
 							className={ns('Button Button--save Modal-saveButton')}
-							onClick={onSaveRequest}
+							type="submit"
 							title={t(['saveData'])}
 						>
 							{t(['save'])}

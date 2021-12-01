@@ -7,11 +7,10 @@ import {InstanceContext} from './InstanceContext';
 interface Props {
 	categories: Category[];
 	apps: App[];
-	consents: Consents;
-	onToggle: (app: App, checked: boolean) => void;
+	defaultConsents: Consents;
 }
 
-const CategorizedAppList = ({categories, apps, consents, onToggle}: Props) => {
+const CategorizedAppList = ({categories, apps, defaultConsents}: Props) => {
 	const {t, ns} = useContext(InstanceContext);
 
 	return (
@@ -29,8 +28,7 @@ const CategorizedAppList = ({categories, apps, consents, onToggle}: Props) => {
 					<div className={ns('CategorizedAppList-apps')}>
 						<AppList
 							apps={pickApps(apps, appNames)}
-							consents={consents}
-							onToggle={onToggle}
+							defaultConsents={defaultConsents}
 						/>
 					</div>
 				</li>
