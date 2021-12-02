@@ -32,3 +32,11 @@ export function overwrite<T>(
 		{}
 	);
 }
+
+export const omitKeys = (
+	object: Record<string, any>,
+	predicate: (key: string) => boolean
+) =>
+	Object.fromEntries(
+		Object.entries(object).filter(([key]) => !predicate(key))
+	);

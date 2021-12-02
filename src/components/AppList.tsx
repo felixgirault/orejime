@@ -5,10 +5,9 @@ import {InstanceContext} from './InstanceContext';
 
 interface Props {
 	apps: App[];
-	defaultConsents: Consents;
 }
 
-const AppList = ({apps, defaultConsents}: Props) => {
+const AppList = ({apps}: Props) => {
 	const {ns} = useContext(InstanceContext);
 
 	return (
@@ -18,7 +17,7 @@ const AppList = ({apps, defaultConsents}: Props) => {
 					key={`app-${app.name}`}
 					className={ns(`AppList-item AppList-item--${app.name}`)}
 				>
-					<AppItem app={app} defaultChecked={defaultConsents[app.name]} />
+					<AppItem app={app} />
 				</li>
 			))}
 		</ul>

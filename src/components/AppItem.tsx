@@ -1,14 +1,14 @@
-import React, {ChangeEvent, useContext} from 'react';
+import React, {useContext} from 'react';
+import useConsent from '../hooks/useConsent';
 import {App} from '../types';
 import {InstanceContext} from './InstanceContext';
 
 interface Props {
 	app: App;
-	defaultChecked: boolean;
 }
 
-export default function AppItem({app, defaultChecked}: Props) {
-	const {t, ns} = useContext(InstanceContext);
+export default function AppItem({app}: Props) {
+	const {t, ns, manager} = useContext(InstanceContext);
 	const {
 		name,
 		title,
@@ -19,17 +19,18 @@ export default function AppItem({app, defaultChecked}: Props) {
 	} = app;
 
 	const id = `orejime-app-item-${name}`;
-	const isChecked = required || defaultChecked;
+	const [isChecked, setChecked] = useConsent(manager, name);
 
 	return (
 		<div className={ns('AppItem')}>
 			<input
+				type="checkbox"
 				id={id}
 				className={ns('AppItem-input')}
 				aria-describedby={`${id}-description`}
 				disabled={required}
 				checked={isChecked}
-				type="checkbox"
+				onChange={(event) => setChecked(event.target.checked)}
 			/>
 
 			<label

@@ -6,7 +6,8 @@
 
 # Done
 
-public interface : resetConsent => resetConsents
+public interface : resetConsent => clearConsents
+manager is synchronous, no save after update
 
 # Specs
 

@@ -7,9 +7,14 @@ export default (config: Config) => {
 	const cookies = new CookieConsentsRepository(config);
 	const dom = new DomTrackersManager(config.apps);
 	const manager = new Manager(config.apps, cookies.read());
+
 	manager.on('update', (diff, all) => {
 		dom.toggle(diff);
 		cookies.write(all);
+	});
+
+	manager.on('clear', () => {
+		cookies.clear();
 	});
 
 	return manager;

@@ -1,4 +1,5 @@
 import React, {useContext} from 'react';
+import useBatchStates from '../hooks/useBatchStates';
 import AppList from './AppList';
 import CategorizedAppList from './CategorizedAppList';
 import {InstanceContext} from './InstanceContext';
@@ -6,6 +7,9 @@ import {InstanceContext} from './InstanceContext';
 export default function Apps() {
 	const {t, ns, config, manager} = useContext(InstanceContext);
 	const {apps, categories} = config;
+	const [areAllTrackersEnabled, areAllTrackersDisabled] = useBatchStates(
+		manager
+	);
 
 	return (
 		<div>
@@ -16,7 +20,7 @@ export default function Apps() {
 						className={ns(
 							'Button Button--info AppToggles-button AppToggles-enableAll'
 						)}
-						disabled={manager.areAllTrackersEnabled()}
+						disabled={areAllTrackersEnabled}
 						onClick={manager.acceptAll.bind(manager)}
 					>
 						{t(['acceptAll'])}
@@ -27,7 +31,7 @@ export default function Apps() {
 						className={ns(
 							'Button Button--info AppToggles-button AppToggles-disableAll'
 						)}
-						disabled={manager.areAllTrackersDisabled()}
+						disabled={areAllTrackersDisabled}
 						onClick={manager.declineAll.bind(manager)}
 					>
 						{t(['declineAll'])}
@@ -36,13 +40,9 @@ export default function Apps() {
 			)}
 
 			{categories ? (
-				<CategorizedAppList
-					categories={categories}
-					apps={apps}
-					defaultConsents={manager.getAllConsents()}
-				/>
+				<CategorizedAppList categories={categories} apps={apps} />
 			) : (
-				<AppList apps={apps} defaultConsents={manager.getAllConsents()} />
+				<AppList apps={apps} />
 			)}
 		</div>
 	);

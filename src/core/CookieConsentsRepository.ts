@@ -4,13 +4,12 @@ import ConsentsMap from './ConsentsMap';
 import ConsentsRepository from './ConsentsRepository';
 
 export default class CookieConsentsRepository implements ConsentsRepository {
-
 	private options: {
-		cookieName: string,
-		cookieDomain: string,
-		cookieDuration: number,
-		parse: (consents: string) => ConsentsMap,
-		stringify: (consents: ConsentsMap) => string,
+		cookieName: string;
+		cookieDomain: string;
+		cookieDuration: number;
+		parse: (consents: string) => ConsentsMap;
+		stringify: (consents: ConsentsMap) => string;
 	};
 
 	constructor(options: Partial<CookieConsentsRepository['options']> = {}) {
@@ -21,16 +20,14 @@ export default class CookieConsentsRepository implements ConsentsRepository {
 			parse: JSON.parse,
 			stringify: JSON.stringify,
 			...options
-		}
+		};
 	}
 
 	read() {
 		const {cookieName, parse} = this.options;
 		const cookie = getCookie(cookieName);
 
-		return cookie
-			? parse(cookie)
-			: {};
+		return cookie ? parse(cookie) : {};
 	}
 
 	write(consents: ConsentsMap) {
@@ -41,12 +38,7 @@ export default class CookieConsentsRepository implements ConsentsRepository {
 			stringify
 		} = this.options;
 
-		setCookie(
-			cookieName,
-			stringify(consents),
-			cookieDuration,
-			cookieDomain
-		);
+		setCookie(cookieName, stringify(consents), cookieDuration, cookieDomain);
 	}
 
 	clear() {

@@ -168,28 +168,33 @@
 				},
 				apps: [
 					{
+						id: "inline-tracker",
 						name: "inline-tracker",
 						title: "Inline Tracker",
 						purposes: ["analytics"],
 						cookies: ["inline-tracker"]
 					},
 					{
+						id: "external-tracker",
 						name: "external-tracker",
 						title: "External Tracker",
 						purposes: ["analytics", "security"],
 						cookies: ["external-tracker"],
 					},
 					{
+						id: "disabled-by-default",
 						name: "disabled-by-default",
 						title: "Something disabled by default",
 						purposes: ["ads"],
 						default: false
 					},
 					{
+						id: "always-on",
 						name: "always-on",
 						title: "Required app",
 						purposes: [],
-						required: true
+						required: true,
+						isMandatory: true
 					}
 				],
 				categories: [
@@ -235,8 +240,7 @@
 			}, false);
 
 			document.querySelector('.reset-button').addEventListener('click', function() {
-				orejime.internals.manager.resetConsents();
-				location.reload();
+				orejime.internals.manager.clearConsents();
 			}, false);
 		</script>
 	</body>

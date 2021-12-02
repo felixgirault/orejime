@@ -17,18 +17,10 @@ export default function ConsentModal({isOpen, onClose, onSave}: Props) {
 	const {t, ns, config, manager} = useContext(InstanceContext);
 	const isDirty = useIsDirty(manager);
 	const isAlert = config.mustConsent && isDirty;
+	const tempManager = manager.clone(); // acts as a store for tracker states
 	const handleSubmit = (event: FormEvent) => {
 		event.preventDefault();
-
-		//
-		//
-		//
-		//SERIALIZE
-		//
-		//
-		//
-
-		onSave({});
+		onSave(tempManager.getAllConsents());
 	};
 
 	return (
@@ -87,7 +79,11 @@ export default function ConsentModal({isOpen, onClose, onSave}: Props) {
 
 				<form className={ns('Modal-form')} onSubmit={handleSubmit}>
 					<div className={ns('Modal-body')}>
-						<Apps />
+						<InstanceContext.Provider
+							value={{t, ns, config, manager: tempManager}}
+						>
+							<Apps />
+						</InstanceContext.Provider>
 					</div>
 
 					<div className={ns('Modal-footer')}>

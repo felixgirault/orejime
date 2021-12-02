@@ -6,7 +6,7 @@ import React, {
 	useImperativeHandle,
 	useState
 } from 'react';
-import ConsentsMap from '../core/ConsentsMap';
+import type ConsentsMap from '../core/ConsentsMap';
 import useIsDirty from '../hooks/useIsDirty';
 import ConsentModal from './ConsentModal';
 import ConsentNoticeWrapper from './ConsentNoticeWrapper';
@@ -24,8 +24,7 @@ const Main: ForwardRefRenderFunction<Handle, Props> = (_, ref) => {
 	const {ns, config, manager} = useContext(InstanceContext);
 	const isDirty = useIsDirty(manager);
 
-	const shouldShowModal = () =>
-		config.mustConsent && isDirty;
+	const shouldShowModal = () => config.mustConsent && isDirty;
 
 	const isNoticeVisible = () =>
 		config.mustConsent || config.noNotice ? false : isDirty;
@@ -40,8 +39,8 @@ const Main: ForwardRefRenderFunction<Handle, Props> = (_, ref) => {
 		setModalOpen(shouldShowModal());
 	};
 
-	const save = (consents: ConsentsMap) => {
-		manager.setConsents(consents);
+	const acceptAll = () => {
+		manager.acceptAll();
 		closeModal();
 	};
 
@@ -50,8 +49,8 @@ const Main: ForwardRefRenderFunction<Handle, Props> = (_, ref) => {
 		closeModal();
 	};
 
-	const acceptAll = () => {
-		manager.acceptAll();
+	const save = (consents: ConsentsMap) => {
+		manager.setConsents(consents);
 		closeModal();
 	};
 
