@@ -9,6 +9,7 @@ import {Config} from './types';
 import {validateConfig, getElement} from './utils/config';
 import {createCssNamespace} from './utils/css';
 import {language, t} from './utils/i18n';
+import translations from './translations';
 
 export const defaultConfig: Config = {
 	elementID: 'orejime',
@@ -19,7 +20,7 @@ export const defaultConfig: Config = {
 	mustNotice: false,
 	logo: false,
 	lang: language(),
-	translations: {},
+	translations,
 	trackers: [],
 	debug: false
 };

@@ -8,11 +8,17 @@ declare global {
 }
 
 export default (manager: Manager) => {
-	document.addEventListener('orejimeAcceptAll', () => {
+	document.addEventListener('orejime.show', () => {
+	});
+
+	document.addEventListener('orejime.acceptAll', () => {
 		manager.acceptAll();
 	});
 
-	document.addEventListener('orejimeDeclineAll', () => {
+	document.addEventListener('orejime.declineAll', () => {
 		manager.declineAll();
+	});
+
+	document.addEventListener('orejime.clear', () => {
 	});
 };

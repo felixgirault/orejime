@@ -2,10 +2,14 @@
   "name": "orejime",
   "private": true,
   "version": "3.0.0",
-  "description": "An easy to use consent manager that focuses on accessibility. A fork of Klaro!.",
+  "description": "The light and accessible consent manager.",
+  "homepage": "https://orejime.empreintedigitale.fr",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/empreinte-digitale/orejime.git"
+  },
+  "bugs": {
+    "url": "https://github.com/empreinte-digitale/orejime/issues"
   },
   "keywords": [
     "cookie",
@@ -13,6 +17,17 @@
     "gdpr",
     "compliance"
   ],
+  "author": "Emmanuel Pelletier <e.pelletier@empreintedigitale.fr>",
+  "contributors": [
+    "Félix Girault <felix.girault@empreintedigitale.coop>"
+  ],
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "start": "parcel serve --target site",
+    "serve": "http-server dist --gzip --brotli",
+    "build": "npm run clean-build && parcel build --no-cache",
+    "clean-build": "rm -Rf ./dist/orejime*"
+  },
   "browser": "dist/orejime.js",
   "legacy": "dist/orejime.js",
   "modern": "dist/orejime.mjs",
@@ -37,6 +52,10 @@
       "engines": {
         "browsers": "defaults, not safari TP and supports es6-module"
       }
+    },
+    "site": {
+      "source": "src/site/index.html",
+      "distDir": "dist-site"
     }
   },
   "parcel-namer-rewrite": {
@@ -48,19 +67,6 @@
     "react": "preact/compat",
     "react-dom": "preact/compat"
   },
-  "scripts": {
-    "start": "parcel serve demo/index.html",
-    "start2": "parcel watch",
-    "serve": "http-server dist --gzip --brotli",
-    "build": "npm run clean-build && parcel build --no-cache",
-    "clean-build": "rm -Rf ./dist/orejime*"
-  },
-  "author": "Emmanuel Pelletier <e.pelletier@empreintedigitale.fr>",
-  "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://github.com/empreinte-digitale/orejime/issues"
-  },
-  "homepage": "https://github.com/empreinte-digitale/orejime#readme",
   "dependencies": {
     "assign-deep": "^1.0.1",
     "js-cookie": "^3.0.1",
@@ -68,9 +74,11 @@
     "react-modal": "^3.14.4"
   },
   "devDependencies": {
+    "@parcel/transformer-sass": "^2.0.1",
     "@parcel/transformer-yaml": "^2.0.1",
     "@types/jest": "^27.0.3",
     "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
     "@types/react-modal": "^3.13.1",
     "http-server": "^14.0.0",
     "jest": "^27.4.3",

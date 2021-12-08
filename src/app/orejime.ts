@@ -1,12 +1,6 @@
 import {setup} from '../core';
 import type {Config} from '../ui';
 
-//
-//
-// code split by hand ?
-//
-//
-
 export default async (config: Config) => {
 	const manager = setup(config);
 	const loadUi = async () => {
