@@ -1,20 +1,23 @@
-import {Config} from '../types';
+import Config from './Config';
 import CookieConsentsRepository from './CookieConsentsRepository';
-import DomTrackersManager from './DomTrackersManager';
+import CookiesConsentsEffect from './CookiesConsentsEffect';
+import DomConsentsEffect from './DomConsentsEffect';
 import Manager from './Manager';
 
 export default (config: Config) => {
-	const cookies = new CookieConsentsRepository(config);
-	const dom = new DomTrackersManager(config.apps);
-	const manager = new Manager(config.apps, cookies.read());
+	const domEffect = new DomConsentsEffect(config.trackers);
+	const cookiesEffect = new CookiesConsentsEffect(config.trackers);
+	const repository = new CookieConsentsRepository(config.cookie);
+	const manager = new Manager(config.trackers, repository.read());
 
 	manager.on('update', (diff, all) => {
-		dom.toggle(diff);
-		cookies.write(all);
+		domEffect.apply(diff);
+		cookiesEffect.apply(diff);
+		repository.write(all);
 	});
 
 	manager.on('clear', () => {
-		cookies.clear();
+		repository.clear();
 	});
 
 	return manager;

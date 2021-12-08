@@ -1,8 +1,9 @@
-import {diff} from '../utils/lang';
-import {omitKeys, overwrite} from '../utils/objects';
 import ConsentsMap from './ConsentsMap';
 import EventEmitter from './EventEmitter';
 import Tracker from './Tracker';
+import diff from './utils/diff';
+import overwrite from './utils/overwrite';
+import withoutAll from './utils/withoutAll';
 
 type ManagerEvents = {
 	dirty: (dirty: boolean) => void;
@@ -11,18 +12,29 @@ type ManagerEvents = {
 };
 
 export default class Manager extends EventEmitter<ManagerEvents> {
-	private trackers: Tracker[];
-	private mandatoryTrackers: Record<Tracker['id'], true>;
+	private readonly trackers: Tracker[];
+	private readonly mandatoryConsents: ConsentsMap;
+	private readonly defaultConsents: ConsentsMap;
+	private invalidConsents: Tracker['id'][];
 	private consents: ConsentsMap;
-	private defaultConsents: ConsentsMap;
-	private hasNewTrackers: boolean;
 
 	constructor(trackers: Tracker[], consents: ConsentsMap = {}) {
 		super();
 
 		this.trackers = trackers;
-		this.hasNewTrackers = this.trackers.some(({id}) => !(id in consents));
-		this.mandatoryTrackers = Object.fromEntries(
+
+		// The manager will be considered dirty until these
+		// consents are made valid (i.e. set, and set
+		// accordingly to their mandatory status)
+		this.invalidConsents = this.trackers
+			.filter((tracker) =>
+				tracker.isMandatory
+					? !consents?.[tracker.id]
+					: !(tracker.id in consents)
+			)
+			.map(({id}) => id);
+
+		this.mandatoryConsents = Object.fromEntries(
 			this.trackers
 				.filter(({isMandatory}) => isMandatory)
 				.map(({id}) => [id, true])
@@ -38,8 +50,13 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 		this.consents = overwrite(this.defaultConsents, consents);
 	}
 
+	// Clones data, but no event handlers.
+	clone() {
+		return new Manager(this.trackers, this.getAllConsents());
+	}
+
 	isDirty() {
-		return this.hasNewTrackers;
+		return this.invalidConsents.length > 0;
 	}
 
 	areAllTrackersMandatory() {
@@ -56,7 +73,7 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 
 	areAllTrackersDisabled() {
 		return this.trackers.length
-			? !this.trackers.some(({id}) => this.consents?.[id])
+			? !this.trackers.some(({id, isMandatory}) => !isMandatory && this.consents?.[id])
 			: false;
 	}
 
@@ -76,9 +93,7 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 
 	declineAll() {
 		this.setConsents(
-			Object.fromEntries(
-				this.trackers.map(({id, isMandatory}) => [id, isMandatory || false])
-			)
+			Object.fromEntries(this.trackers.map(({id}) => [id, false]))
 		);
 	}
 
@@ -89,17 +104,13 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 	}
 
 	setConsents(consents: ConsentsMap) {
-		const allowed = omitKeys(consents, (id) => id in this.mandatoryTrackers);
+		this.updateConsents(consents);
 
-		if (!Object.keys(allowed).length) {
-			return;
-		}
+		this.invalidConsents = withoutAll(
+			this.invalidConsents,
+			Object.keys(consents)
+		);
 
-		const updated = diff(allowed, this.consents);
-		this.consents = {...this.consents, ...allowed};
-		this.hasNewTrackers = false;
-
-		this.emit('update', updated, this.consents);
 		this.emit('dirty', this.isDirty());
 	}
 
@@ -108,14 +119,26 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 	}
 
 	clearConsents() {
-		this.resetConsents();
-		this.hasNewTrackers = true;
+		this.updateConsents({...this.defaultConsents});
+
+		this.invalidConsents = withoutAll(
+			this.trackers.map(({id}) => id),
+			Object.keys(this.mandatoryConsents)
+		);
 
 		this.emit('clear');
 		this.emit('dirty', this.isDirty());
 	}
 
-	clone() {
-		return new Manager(this.trackers, this.getAllConsents());
+	private updateConsents(consents: ConsentsMap) {
+		const fixed = overwrite(consents, this.mandatoryConsents);
+		const updated = diff(fixed, this.consents);
+
+		this.consents = {
+			...this.consents,
+			...fixed
+		};
+
+		this.emit('update', updated, this.consents);
 	}
 }

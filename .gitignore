@@ -1,6 +1,7 @@
 node_modules
 /dist/orejime.js
+/dist/orejime*.js*
+/dist/orejime*.mjs*
 /dist/orejime.css
 /dist/orejime.scss
-/es
-/lib
+/.parcel-cache

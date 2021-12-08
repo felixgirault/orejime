@@ -1,6 +1,6 @@
 # Orejime 🍪
 
-> Let your users choose the cookies they eat on your website.  
+> Let your users choose the cookies they eat on your website.
 > Orejime 🍪 is an easy to use consent manager that focuses on accessibility.
 
 ## Introduction
@@ -26,10 +26,12 @@ The easiest way to use the lib is to include the built files directly in the bro
 
 ```html
 <link rel="stylesheet" href="https://unpkg.com/orejime@latest/dist/orejime.css" />
-<script src="https://unpkg.com/orejime@latest/dist/orejime.js"></script>
+
+<script type="module" src="https://unpkg.com/orejime@latest/dist/orejime.mjs" defer></script>
+<script nomodule src="https://unpkg.com/orejime@latest/dist/orejime.js"></script>
 ```
 
-If you're using this method, please avoid using the `@latest` version. Prefer a fixed one like `https://unpkg.com/orejime@2.0.1/...`. 
+If you're using this method, please avoid using the `@latest` version. Prefer a fixed one like `https://unpkg.com/orejime@2.0.1/...`.
 That way you can ensure you will not be impacted by a change of API or a potential bug that could land in the latest version.
 
 #### Via npm
@@ -40,7 +42,7 @@ Orejime 🍪 is a React lib. Make sure you already installed react and react-dom
 npm install orejime
 ```
 
-The CSS is located in `node_modules/orejime/dist/orejime.css`. Import it directly in your JS thanks to webpack, or install it any way you are used to in your project.  
+The CSS is located in `node_modules/orejime/dist/orejime.css`. Import it directly in your JS thanks to webpack, or install it any way you are used to in your project.
 You can also directly consume the Sass file if you prefer, located in the same folder.
 
 Note: if you don't have a React environment but still want to use npm in order to easily get the latest version of Orejime, the already-built JS file is located in `node_modules/orejime/dist/orejime.js`.
@@ -314,7 +316,7 @@ Orejime.init(orejimeConfig);
 
 #### CSS
 
-Either replace the original CSS entirely, or add your custom stylesheet to overwrite only some of the rules.  
+Either replace the original CSS entirely, or add your custom stylesheet to overwrite only some of the rules.
 For example:
 
 ```css
@@ -332,8 +334,8 @@ For example:
 
 #### Sass
 
-You can import [the original Sass stylesheet](https://github.com/empreinte-digitale/orejime/blob/master/src/scss/orejime.scss) into your own, and tweak it as you wish.  
-Orejime provides default variables that you can overwrite to quickly change its appearance.  
+You can import [the original Sass stylesheet](https://github.com/empreinte-digitale/orejime/blob/master/src/scss/orejime.scss) into your own, and tweak it as you wish.
+Orejime provides default variables that you can overwrite to quickly change its appearance.
 For example:
 
 ```scss
@@ -364,7 +366,9 @@ npm install
 npm start
 ```
 
-You can then open the demo page on `http://localhost:3000` - it will be reloaded automatically when the JS or CSS changes.
+You can then open the demo page on `http://localhost:1234` - it will be reloaded automatically when the JS or CSS changes.
+
+Orejime uses Parcel [...]
 
 ## License & credits
 

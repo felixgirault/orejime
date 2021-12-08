@@ -2,12 +2,24 @@
 
 * add a css classmap to allow for restyles
 * remove categories and use purposes
+* remove all unused things
 * rename app => tracker
+* check all TODO comments
+* switch to rollup
+* https://github.com/vitejs/vite/tree/main/packages/plugin-legacy
+* externalize translations
+* cleanup tsconfigs
+* report package.json info to each package
+* report npmignore and test publish on a private repo
+* check each configuration var and report changes
+* update authors and meta in packages
 
 # Done
 
 public interface : resetConsent => clearConsents
 manager is synchronous, no save after update
+app.callback => manager.on()
+* no more multiple instances
 
 # Specs
 

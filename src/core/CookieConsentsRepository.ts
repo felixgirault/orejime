@@ -1,22 +1,16 @@
-import {deleteCookie} from '../utils/cookies';
-import {getCookie, setCookie} from '../utils/cookies';
+import {getCookie, setCookie, deleteCookie} from './utils/cookies';
 import ConsentsMap from './ConsentsMap';
 import ConsentsRepository from './ConsentsRepository';
+import CookieOptions from './CookieOptions';
 
 export default class CookieConsentsRepository implements ConsentsRepository {
-	private options: {
-		cookieName: string;
-		cookieDomain: string;
-		cookieDuration: number;
-		parse: (consents: string) => ConsentsMap;
-		stringify: (consents: ConsentsMap) => string;
-	};
+	private options: CookieOptions;
 
-	constructor(options: Partial<CookieConsentsRepository['options']> = {}) {
+	constructor(options: Partial<CookieOptions> = {}) {
 		this.options = {
-			cookieName: 'eu-consent',
-			cookieDomain: undefined,
-			cookieDuration: 120,
+			name: 'eu-consent',
+			domain: undefined,
+			duration: 120,
 			parse: JSON.parse,
 			stringify: JSON.stringify,
 			...options
@@ -24,25 +18,17 @@ export default class CookieConsentsRepository implements ConsentsRepository {
 	}
 
 	read() {
-		const {cookieName, parse} = this.options;
-		const cookie = getCookie(cookieName);
-
+		const {name, parse} = this.options;
+		const cookie = getCookie(name);
 		return cookie ? parse(cookie) : {};
 	}
 
 	write(consents: ConsentsMap) {
-		const {
-			cookieName,
-			cookieDomain,
-			cookieDuration,
-			stringify
-		} = this.options;
-
-		setCookie(cookieName, stringify(consents), cookieDuration, cookieDomain);
+		const {name, domain, duration, stringify} = this.options;
+		setCookie(name, stringify(consents), duration, domain);
 	}
 
 	clear() {
-		const {cookieName} = this.options;
-		deleteCookie(cookieName);
+		deleteCookie(this.options.name);
 	}
 }

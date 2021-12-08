@@ -30,15 +30,29 @@ describe('Consents', () => {
 	test('areAllTrackersEnabled', () => {
 		const managerA = new Manager([]);
 
-		expect(managerA.areAllTrackersMandatory()).toBeFalsy();
+		expect(managerA.areAllTrackersEnabled()).toBeFalsy();
 
-		const managerB = new Manager([tracker(), tracker({isMandatory: true})]);
+		const managerB = new Manager([tracker(), tracker({default: true})]);
 
-		expect(managerB.areAllTrackersMandatory()).toBeFalsy();
+		expect(managerB.areAllTrackersEnabled()).toBeFalsy();
 
-		const managerC = new Manager([tracker({isMandatory: true})]);
+		const managerC = new Manager([tracker({default: true})]);
 
-		expect(managerC.areAllTrackersMandatory()).toBeTruthy();
+		expect(managerC.areAllTrackersEnabled()).toBeTruthy();
+	});
+
+	test('areAllTrackersDisabled', () => {
+		const managerA = new Manager([]);
+
+		expect(managerA.areAllTrackersDisabled()).toBeFalsy();
+
+		const managerB = new Manager([tracker(), tracker({default: true})]);
+
+		expect(managerB.areAllTrackersDisabled()).toBeFalsy();
+
+		const managerC = new Manager([tracker()]);
+
+		expect(managerC.areAllTrackersDisabled()).toBeTruthy();
 	});
 
 	test('getConsent', () => {
@@ -74,7 +88,10 @@ describe('Consents', () => {
 
 	test('acceptAll', () => {
 		const trackerA = tracker();
-		const trackerB = tracker();
+		const trackerB = tracker({
+			default: true
+		});
+
 		const dirtyCallback = jest.fn();
 		const updateCallback = jest.fn();
 		const expectedConsents = {
@@ -82,24 +99,8 @@ describe('Consents', () => {
 			[trackerB.id]: true
 		};
 
-		const manager = new Manager([trackerA, trackerB]);
-		manager.on('dirty', dirtyCallback);
-		manager.on('update', updateCallback);
-		manager.acceptAll();
-
-		expect(manager.getAllConsents()).toEqual(expectedConsents);
-		expect(dirtyCallback.mock.calls).toEqual([[false]]);
-		expect(updateCallback.mock.calls).toEqual([[expectedConsents]]);
-	});
-
-	test('declineAll', () => {
-		const trackerA = tracker();
-		const trackerB = tracker();
-		const dirtyCallback = jest.fn();
-		const updateCallback = jest.fn();
-		const expectedConsents = {
-			[trackerA.id]: false,
-			[trackerB.id]: false
+		const expectedDiff = {
+			[trackerA.id]: true
 		};
 
 		const manager = new Manager([trackerA, trackerB]);
@@ -109,6 +110,36 @@ describe('Consents', () => {
 
 		expect(manager.getAllConsents()).toEqual(expectedConsents);
 		expect(dirtyCallback.mock.calls).toEqual([[false]]);
-		expect(updateCallback.mock.calls).toEqual([[expectedConsents]]);
+		expect(updateCallback.mock.calls).toEqual([[expectedDiff, expectedConsents]]);
+	});
+
+	test('declineAll', () => {
+		const trackerA = tracker({
+			default: true
+		});
+
+		const trackerB = tracker({
+			isMandatory: true
+		});
+
+		const dirtyCallback = jest.fn();
+		const updateCallback = jest.fn();
+		const expectedConsents = {
+			[trackerA.id]: false,
+			[trackerB.id]: true
+		};
+
+		const expectedDiff = {
+			[trackerA.id]: false
+		};
+
+		const manager = new Manager([trackerA, trackerB]);
+		manager.on('dirty', dirtyCallback);
+		manager.on('update', updateCallback);
+		manager.declineAll();
+
+		expect(manager.getAllConsents()).toEqual(expectedConsents);
+		expect(dirtyCallback.mock.calls).toEqual([[false]]);
+		expect(updateCallback.mock.calls).toEqual([[expectedDiff, expectedConsents]]);
 	});
 });

@@ -3,11 +3,9 @@ export default class EventEmitter<
 		[name: string]: (...args: any[]) => void;
 	}
 > {
-	private listeners: Partial<
-		{
-			[Key in keyof Types]: Array<Types[Key]>;
-		}
-	>;
+	private listeners: Partial<{
+		[Key in keyof Types]: Array<Types[Key]>;
+	}>;
 
 	constructor() {
 		this.listeners = {};
@@ -18,14 +16,20 @@ export default class EventEmitter<
 			this.listeners[event] = [];
 		}
 
-		this.listeners[event].push(listener);
+		(this.listeners[event] as Types[Key][]).push(listener);
 	}
 
 	off<Key extends keyof Types>(event: Key, listener: Types[Key]): void {
-		const index = this.listeners[event].findIndex((l) => l === listener);
+		if (!(event in this.listeners)) {
+			return;
+		}
+
+		const index = (this.listeners[event] as Types[Key][]).findIndex(
+			(l) => l === listener
+		);
 
 		if (index >= 0) {
-			this.listeners[event].splice(index, 1);
+			(this.listeners[event] as Types[Key][]).splice(index, 1);
 		}
 	}
 
@@ -37,7 +41,7 @@ export default class EventEmitter<
 			return;
 		}
 
-		this.listeners[event].forEach((listener) => {
+		(this.listeners[event] as Types[Key][]).forEach((listener) => {
 			listener(...args);
 		});
 	}

@@ -1,6 +1,7 @@
 {
   "name": "orejime",
-  "version": "2.1.0",
+  "private": true,
+  "version": "3.0.0",
   "description": "An easy to use consent manager that focuses on accessibility. A fork of Klaro!.",
   "repository": {
     "type": "git",
@@ -12,19 +13,47 @@
     "gdpr",
     "compliance"
   ],
-  "main": "lib/orejime.js",
-  "module": "es/orejime.js",
+  "browser": "dist/orejime.js",
+  "legacy": "dist/orejime.js",
+  "modern": "dist/orejime.mjs",
+  "types": "dist/types.d.ts",
+  "targets": {
+    "browser": false,
+    "legacy": {
+      "context": "browser",
+      "source": "src/app/orejime.umd.ts",
+      "includeNodeModules": true,
+      "optimize": true,
+      "engines": {
+        "browsers": "ie 11"
+      }
+    },
+    "modern": {
+      "context": "browser",
+      "source": "src/app/orejime.umd.ts",
+      "outputFormat": "esmodule",
+      "includeNodeModules": true,
+      "optimize": true,
+      "engines": {
+        "browsers": "defaults, not safari TP and supports es6-module"
+      }
+    }
+  },
+  "parcel-namer-rewrite": {
+    "rules": {
+      "ui(.*).js": "orejime-ui$1{.hash}.js"
+    }
+  },
+  "alias": {
+    "react": "preact/compat",
+    "react-dom": "preact/compat"
+  },
   "scripts": {
-    "start": "cross-env NODE_ENV=development npm run umd -- --watch & npm run serve",
-    "serve": "browser-sync start -s --serveStatic dist -w -f dist/orejime.{css,js} --no-open",
-    "test": "cross-env BABEL_ENV=cjs jest",
-    "cjs": "cross-env BABEL_ENV=cjs babel --extensions .ts,.tsx --out-dir lib src",
-    "es": "cross-env BABEL_ENV=es babel --extensions .ts,.tsx --out-dir es src",
-    "umd": "cross-env BABEL_ENV=umd webpack",
-    "copy-scss": "cp src/scss/orejime.scss dist/orejime.scss",
-    "build": "npm run test && npm run clean-build && npm run cjs && npm run es && cross-env NODE_ENV=production npm run umd && npm run copy-scss",
-    "clean-build": "rm -Rf ./dist/orejime.{js,css,scss} && rm -Rf ./lib && rm -Rf ./es",
-    "prepublishOnly": "npm run build"
+    "start": "parcel serve demo/index.html",
+    "start2": "parcel watch",
+    "serve": "http-server dist --gzip --brotli",
+    "build": "npm run clean-build && parcel build --no-cache",
+    "clean-build": "rm -Rf ./dist/orejime*"
   },
   "author": "Emmanuel Pelletier <e.pelletier@empreintedigitale.fr>",
   "license": "BSD-3-Clause",
@@ -33,45 +62,19 @@
   },
   "homepage": "https://github.com/empreinte-digitale/orejime#readme",
   "dependencies": {
-    "@babel/runtime": "^7.1.2",
-    "react-modal": "^3.13.1"
+    "assign-deep": "^1.0.1",
+    "js-cookie": "^3.0.1",
+    "preact": "^10.6.3",
+    "react-modal": "^3.14.4"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.2",
-    "@babel/core": "^7.1.2",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/plugin-transform-runtime": "^7.1.0",
-    "@babel/preset-env": "^7.1.0",
-    "@babel/preset-react": "^7.0.0",
-    "@babel/preset-typescript": "^7.13.0",
-    "@types/jest": "^26.0.22",
-    "@types/js-cookie": "^2.2.7",
-    "@types/node": "^14.14.35",
-    "@types/react": "^16.14.5",
-    "@types/react-dom": "^16.9.12",
-    "@types/react-modal": "^3.12.0",
-    "assign-deep": "^1.0.1",
-    "babel-jest": "^26.6.3",
-    "babel-loader": "^8.0.4",
-    "babel-plugin-convert-to-json": "^0.1.0",
-    "browser-sync": "^2.26.3",
-    "cross-env": "^5.2.0",
-    "css-loader": "^0.28.11",
-    "fork-ts-checker-webpack-plugin": "^6.2.0",
-    "jest": "^26.6.3",
-    "js-cookie": "^3.0.1",
-    "mini-css-extract-plugin": "^0.4.4",
-    "preact": "^10.5.14",
-    "prettier": "^2.2.1",
-    "prettier-loader": "^3.3.0",
-    "sass": "^1.44.0",
-    "sass-loader": "^9.0.3",
-    "typescript": "^4.2.3",
-    "webpack": "^4.46.0",
-    "webpack-cli": "^3.1.2"
-  },
-  "peerDependencies": {
-    "react": "^0.14.0 || ^15.0.0 || ^16",
-    "react-dom": "^0.14.0 || ^15.0.0 || ^16"
+    "@parcel/transformer-yaml": "^2.0.1",
+    "@types/jest": "^27.0.3",
+    "@types/react": "^17.0.37",
+    "@types/react-modal": "^3.13.1",
+    "http-server": "^14.0.0",
+    "jest": "^27.4.3",
+    "parcel": "^2.0.1",
+    "parcel-namer-rewrite": "^2.0.0-rc.1"
   }
 }
