@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import useConsent from '../hooks/useConsent';
+import {useConsent} from '../../react';
 import {Tracker} from '../types';
 import {InstanceContext} from './InstanceContext';
 

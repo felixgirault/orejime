@@ -1,11 +1,11 @@
 import type {ForwardRefRenderFunction, Ref} from 'react';
-import React, {
+import {
 	forwardRef,
 	useContext,
 	useImperativeHandle,
 	useState
 } from 'react';
-import useIsDirty from '../hooks/useIsDirty';
+import {useIsDirty} from '../../react';
 import ConsentModal from './ConsentModal';
 import ConsentNoticeWrapper from './ConsentNoticeWrapper';
 import {InstanceContext} from './InstanceContext';

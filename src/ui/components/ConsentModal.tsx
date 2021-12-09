@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import useIsDirty from '../hooks/useIsDirty';
+import {useIsDirty} from '../../react';
 import {template} from '../utils/template';
 import Apps from './Apps';
 import DeferredManagerProvider from './DeferredManagerProvider';

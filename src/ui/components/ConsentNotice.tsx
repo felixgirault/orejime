@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import useIsDirty from '../hooks/useIsDirty';
+import {useIsDirty} from '../../react';
 import {getPurposes} from '../utils/apps';
 import {getLogoAlternative, getLogoUrl} from '../utils/config';
 import {template} from '../utils/template';

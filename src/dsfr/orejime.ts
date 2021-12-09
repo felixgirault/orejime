@@ -1,20 +1,31 @@
 import {setup} from '../core';
 import type {Config} from '../ui';
 
+// move to chunk
+const loadTemplate = async (template: string | (() => string) | (() => Promise<string>)) => {
+	if (typeof template === 'string') {
+		return template;
+	}
+
+	const body = template();
+
+	if (typeof body === 'string') {
+		return body;
+	}
+
+	if ('then' in template) {
+		return await template;
+	}
+
+	throw new Error();
+};
+
 export default async (config: Config) => {
 	const manager = setup(config);
-	const preload = () => {
-		import('../ui');
-	};
 
-	const loadUi = async () => {
-		const setupUi = (await import('../ui')).setup;
-		return setupUi(config, manager);
-	};
+	const show = () => {
 
-	const show = async () => {
-		(await loadUi()).show();
-	};
+	}
 
 	manager.on('dirty', (isDirty) => {
 		if (isDirty) {

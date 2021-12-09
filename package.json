@@ -24,6 +24,7 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "start": "parcel serve --target site",
+    "start-dsfr": "parcel serve --target dsfr",
     "serve": "http-server dist --gzip --brotli",
     "build": "npm run clean-build && parcel build --no-cache",
     "clean-build": "rm -Rf ./dist/orejime*"
@@ -56,6 +57,10 @@
     "site": {
       "source": "src/site/index.html",
       "distDir": "dist-site"
+    },
+    "dsfr": {
+      "source": "src/dsfr/index.html",
+      "distDir": "dist-dsfr"
     }
   },
   "parcel-namer-rewrite": {
@@ -74,6 +79,7 @@
     "react-modal": "^3.14.4"
   },
   "devDependencies": {
+    "@gouvfr/dsfr": "^1.2.1",
     "@parcel/transformer-sass": "^2.0.1",
     "@parcel/transformer-yaml": "^2.0.1",
     "@types/jest": "^27.0.3",

@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import useBatchStates from '../hooks/useBatchStates';
+import {useBatchStates} from '../../react';
 import AppList from './AppList';
 import CategorizedAppList from './CategorizedAppList';
 import {InstanceContext} from './InstanceContext';

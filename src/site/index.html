@@ -9,7 +9,7 @@
 		<title>Orejime - Easy to use consent manager that focuses on accessibility</title>
 
 		<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
-		
+
 		<link rel="stylesheet" href="../scss/orejime.scss" />
 		<link rel="stylesheet" href="./example-assets/style.css" />
 
@@ -70,8 +70,8 @@
 						</p>
 
 						<div class="ButtonGroup">
-							<button type="button" class="Button consent-modal-button">Open consent modal</button>
-							<button type="button" class="Button reset-button">Reset consent</button>
+							<button type="button" class="Button consent-modal-button" data-orejime-preload>Open consent modal</button>
+							<button type="button" class="Button reset-button" data-orejime-preload>Reset consent</button>
 						</div>
 					</div>
 
@@ -115,6 +115,7 @@
 						<a href="https://empreintedigitale.fr" title="Development (fr)">Development</a>
 						• <a href="https://cloud.empreintedigitale.fr" title="Cloud (fr)">Cloud</a>
 						• <a href="https://accessibilitenumerique.empreintedigitale.fr" title="Accessibility (fr)">Accessibility</a>
+						• <a href="https://rgpd.empreintedigitale.fr" title="GDPR (fr)">GDPR</a>
 						<br />
 						<a href="mailto:contact@empreintedigitale.fr">E-mail</a>
 						• <a href="https://twitter.com/empr1tedigitale">Twitter</a>
@@ -135,7 +136,6 @@
 			window.orejimeConfig = {
 				appElement: "#app",
 				privacyPolicy: "#privacyPolicy",
-				cookieName: 'eu-consent',
 				translations: {
 					en: {
 						consentModal: {
@@ -266,11 +266,19 @@
 			// a window.orejime instance was created when including the lib
 			document.querySelector('.consent-modal-button').addEventListener('click', function() {
 				window.orejime.show();
-			}, false);
+			});
 
 			document.querySelector('.reset-button').addEventListener('click', function() {
 				window.orejime.manager.clearConsents();
-			}, false);
+			});
+
+			document.querySelector('[data-orejime-preload]').addEventListener('focus', function() {
+				window.orejime.preload();
+			});
+
+			document.querySelector('[data-orejime-preload]').addEventListener('mouseover', function() {
+				window.orejime.preload();
+			});
 		</script>
 	</body>
 </html>
