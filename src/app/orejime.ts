@@ -1,7 +1,8 @@
 import {setup} from '../core';
 import type {Config} from '../ui';
+import umd from '../umd';
 
-export default async (config: Config) => {
+umd(async (config: Config) => {
 	const manager = setup(config);
 	const preload = () => {
 		import('../ui');
@@ -36,4 +37,4 @@ export default async (config: Config) => {
 		manager,
 		preload
 	};
-};
+});

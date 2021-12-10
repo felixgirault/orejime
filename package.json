@@ -37,7 +37,7 @@
     "browser": false,
     "legacy": {
       "context": "browser",
-      "source": "src/app/orejime.umd.ts",
+      "source": "src/app/orejime.ts",
       "includeNodeModules": true,
       "optimize": true,
       "engines": {
@@ -46,7 +46,7 @@
     },
     "modern": {
       "context": "browser",
-      "source": "src/app/orejime.umd.ts",
+      "source": "src/app/orejime.ts",
       "outputFormat": "esmodule",
       "includeNodeModules": true,
       "optimize": true,

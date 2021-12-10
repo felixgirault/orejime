@@ -30,18 +30,18 @@
 				</div>
 				<ul class="fr-consent-banner__buttons fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-sm">
 					<li>
-						<button class="fr-btn orejime-accept-all">
+						<button class="fr-btn" data-orejime-notice-accept>
 							Tout accepter
 						</button>
 					</li>
 					<li>
-						<button class="fr-btn orejime-decline-all">
+						<button class="fr-btn" data-orejime-notice-decline>
 							Tout refuser
 						</button>
 					</li>
 					<li>
 						<!-- Ce bouton permet l'ouverture de la modale de finalité ayant pour id 'fr-consent-modal' -->
-						<button class="fr-btn fr-btn--secondary orejime-configure" data-fr-opened="false" aria-controls="fr-consent-modal">
+						<button class="fr-btn fr-btn--secondary" data-fr-opened="false" aria-controls="fr-consent-modal" data-orejime-notice-configure>
 							Personnaliser
 						</button>
 					</li>
@@ -95,24 +95,7 @@
 			}
 		</script>
 
-		<script type="module" src="./orejime.umd.ts"></script>
-
-		<script>
-			if (window.orejime.manager.isDirty()) {
-				document.querySelector('#productrow');
-			}
-
-			document.querySelector('.orejime-accept-all').addEventListener('click', function() {
-				window.orejime.manager.acceptAll();
-			});
-
-			document.querySelector('.orejime-decline-all').addEventListener('click', function() {
-				window.orejime.manager.declineAll();
-			});
-
-			document.querySelector('.orejime-configure').addEventListener('click', function() {
-
-			});
-		</script>
+		<script type="module" src="./orejime.ts"></script>
+		<script type="module" src="./setup.ts"></script>
 	</body>
 </html>

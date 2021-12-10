@@ -1,8 +1,9 @@
 import {setup} from '../core';
 import type {Config} from '../ui';
+import umd from '../umd';
 
 // move to chunk
-const loadTemplate = async (template: string | (() => string) | (() => Promise<string>)) => {
+const loadTemplate = async (template: string | (() => HTMLElement) | (() => Promise<HTMLElement>)) => {
 	if (typeof template === 'string') {
 		return template;
 	}
@@ -20,10 +21,14 @@ const loadTemplate = async (template: string | (() => string) | (() => Promise<s
 	throw new Error();
 };
 
-export default async (config: Config) => {
+umd(async (config: Config) => {
 	const manager = setup(config);
 
 	const show = () => {
+		const noticeTemplate = loadTemplate(config.dsfr.noticeTemplate);
+	}
+
+	const setupNotice = () => {
 
 	}
 
@@ -38,13 +43,10 @@ export default async (config: Config) => {
 			config,
 			manager,
 			show,
-			preload
 		};
 	}
 
 	return {
-		...(await loadUi()),
 		manager,
-		preload
 	};
-};
+})
