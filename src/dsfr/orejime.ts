@@ -21,16 +21,34 @@ const loadTemplate = async (template: string | (() => HTMLElement) | (() => Prom
 	throw new Error();
 };
 
-umd(async (config: Config) => {
+interface DsfrConfig extends Config {
+	consentBannerSelector: string
+}
+
+umd(async (config: DsfrConfig) => {
+	const fullConfig = {
+		consentBannerSelector: '.fr-consent-banner',
+		consentModalSelector: '#fr-consent-modal',
+		consentModalSubmitSelector: '.fr-consent-manager__buttons .fr-btn',
+		...config
+	}
+
 	const manager = setup(config);
+	const notice = document.querySelector(fullConfig.consentBannerSelector);
+	const modal = document.querySelector(fullConfig.consentModalSelector);
+	const submitButton = document.querySelector(fullConfig.consentModalSubmitSelector);
 
 	const show = () => {
-		const noticeTemplate = loadTemplate(config.dsfr.noticeTemplate);
+		notice;
 	}
 
 	const setupNotice = () => {
 
 	}
+
+	submitButton.addEventListener('click', () => {
+		const services = document.querySelectorAll('.fr-consent-service');
+	});
 
 	manager.on('dirty', (isDirty) => {
 		if (isDirty) {

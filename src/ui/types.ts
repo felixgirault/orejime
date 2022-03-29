@@ -1,11 +1,11 @@
-import type {Config as CoreConfig, Tracker as CoreTracker} from '../core';
+import type {Config as CoreConfig, Purpose as CorePurpose} from '../core';
 
 export type JsonParser = (json: string) => any;
 export type JsonSerializer = (json: any) => string;
 export type CssNamespace = (className: string) => string;
 export type Translate = (path: string[]) => string;
 
-export interface Tracker extends CoreTracker {
+export interface Purpose extends CorePurpose {
 	title: string;
 	description: string;
 	purposes?: string[];
@@ -34,7 +34,7 @@ export interface Config extends CoreConfig {
 	privacyPolicy: string;
 	stylePrefix: string;
 	translations: {};
-	trackers: Tracker[]
+	purposes: Purpose[]
 }
 
 export interface Consents {

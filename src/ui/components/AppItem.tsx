@@ -1,22 +1,21 @@
 import React, {useContext} from 'react';
 import {useConsent} from '../../react';
-import {Tracker} from '../types';
+import {Purpose} from '../types';
 import {InstanceContext} from './InstanceContext';
 
 interface Props {
-	tracker: Tracker;
+	purpose: Purpose;
 }
 
-export default function AppItem({tracker}: Props) {
+export default function AppItem({purpose}: Props) {
 	const {t, ns, manager} = useContext(InstanceContext);
 	const {
 		id,
 		title,
 		description,
 		isMandatory = false,
-		optOut = false,
-		purposes = []
-	} = tracker;
+		optOut = false
+	} = purpose;
 
 	const itemId = `orejime-app-item-${id}`;
 	const [isChecked, setChecked] = useConsent(manager, id);
@@ -84,15 +83,6 @@ export default function AppItem({tracker}: Props) {
 						__html: t([id, 'description']) || description
 					}}
 				/>
-
-				{purposes.length > 0 ? (
-					<p className={ns('AppItem-purposes')}>
-						{t(['app', purposes.length > 1 ? 'purposes' : 'purpose'])}:{' '}
-						{purposes
-							.map((purpose) => t(['purposes', purpose]))
-							.join(', ')}
-					</p>
-				) : null}
 			</div>
 		</div>
 	);

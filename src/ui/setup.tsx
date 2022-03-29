@@ -4,7 +4,7 @@ import React, {createRef} from 'react';
 import type {ElementRef} from 'react';
 import {render} from 'react-dom';
 import {InstanceContext} from './components/InstanceContext';
-import Main from './components/Main';
+import Main from './components/dsfr/Main';
 import {Config} from './types';
 import {validateConfig, getElement} from './utils/config';
 import {createCssNamespace} from './utils/css';

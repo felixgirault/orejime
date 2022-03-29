@@ -1,8 +1,17 @@
 import ConsentsMap from './ConsentsMap';
 import EventEmitter from './EventEmitter';
-import Tracker from './Tracker';
+import Purpose from './Purpose';
 import diff from './utils/diff';
 import overwrite from './utils/overwrite';
+import {
+	acceptedConsents,
+	areAllPurposesDisabled,
+	areAllPurposesEnabled,
+	areAllPurposesMandatory,
+	declinedConsents,
+	defaultConsents,
+	isConsentValid
+} from './utils/purposes';
 import withoutAll from './utils/withoutAll';
 
 type ManagerEvents = {
@@ -12,72 +21,53 @@ type ManagerEvents = {
 };
 
 export default class Manager extends EventEmitter<ManagerEvents> {
-	private readonly trackers: Tracker[];
+	private readonly purposes: Purpose[];
 	private readonly mandatoryConsents: ConsentsMap;
 	private readonly defaultConsents: ConsentsMap;
-	private invalidConsents: Tracker['id'][];
+	private invalidConsentsIds: Purpose['id'][];
 	private consents: ConsentsMap;
 
-	constructor(trackers: Tracker[], consents: ConsentsMap = {}) {
+	constructor(purposes: Purpose[], consents: ConsentsMap = {}) {
 		super();
-
-		this.trackers = trackers;
 
 		// The manager will be considered dirty until these
 		// consents are made valid (i.e. set, and set
 		// accordingly to their mandatory status)
-		this.invalidConsents = this.trackers
-			.filter((tracker) =>
-				tracker.isMandatory
-					? !consents?.[tracker.id]
-					: !(tracker.id in consents)
-			)
+		this.invalidConsentsIds = purposes
+			.filter((purpose) => !isConsentValid(purpose, consents))
 			.map(({id}) => id);
 
-		this.mandatoryConsents = Object.fromEntries(
-			this.trackers
-				.filter(({isMandatory}) => isMandatory)
-				.map(({id}) => [id, true])
+		this.defaultConsents = defaultConsents(purposes);
+		this.mandatoryConsents = acceptedConsents(
+			this.purposes.filter(({isMandatory}) => isMandatory)
 		);
 
-		this.defaultConsents = Object.fromEntries(
-			this.trackers.map(({id, isMandatory, default: d}) => [
-				id,
-				isMandatory || !!d
-			])
-		);
-
+		this.purposes = purposes;
 		this.consents = overwrite(this.defaultConsents, consents);
 	}
 
 	// Clones data, but no event handlers.
 	clone() {
-		return new Manager(this.trackers, this.getAllConsents());
+		return new Manager(this.purposes, this.getAllConsents());
 	}
 
 	isDirty() {
-		return this.invalidConsents.length > 0;
+		return this.invalidConsentsIds.length > 0;
 	}
 
-	areAllTrackersMandatory() {
-		return this.trackers.length
-			? !this.trackers.some(({isMandatory}) => !isMandatory)
-			: false;
+	areAllPurposesMandatory() {
+		return areAllPurposesMandatory(this.purposes);
 	}
 
-	areAllTrackersEnabled() {
-		return this.trackers.length
-			? !this.trackers.some(({id}) => !this.consents?.[id])
-			: false;
+	areAllPurposesEnabled() {
+		return areAllPurposesEnabled(this.purposes, this.consents);
 	}
 
-	areAllTrackersDisabled() {
-		return this.trackers.length
-			? !this.trackers.some(({id, isMandatory}) => !isMandatory && this.consents?.[id])
-			: false;
+	areAllPurposesDisabled() {
+		return areAllPurposesDisabled(this.purposes, this.consents);
 	}
 
-	getConsent(id: Tracker['id']) {
+	getConsent(id: Purpose['id']) {
 		return this.consents?.[id];
 	}
 
@@ -86,18 +76,14 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 	}
 
 	acceptAll() {
-		this.setConsents(
-			Object.fromEntries(this.trackers.map(({id}) => [id, true]))
-		);
+		this.setConsents(acceptedConsents(this.purposes));
 	}
 
 	declineAll() {
-		this.setConsents(
-			Object.fromEntries(this.trackers.map(({id}) => [id, false]))
-		);
+		this.setConsents(declinedConsents(this.purposes));
 	}
 
-	setConsent(id: Tracker['id'], state: boolean) {
+	setConsent(id: Purpose['id'], state: boolean) {
 		this.setConsents({
 			[id]: state
 		});
@@ -106,8 +92,8 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 	setConsents(consents: ConsentsMap) {
 		this.updateConsents(consents);
 
-		this.invalidConsents = withoutAll(
-			this.invalidConsents,
+		this.invalidConsentsIds = withoutAll(
+			this.invalidConsentsIds,
 			Object.keys(consents)
 		);
 
@@ -121,8 +107,8 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 	clearConsents() {
 		this.updateConsents({...this.defaultConsents});
 
-		this.invalidConsents = withoutAll(
-			this.trackers.map(({id}) => id),
+		this.invalidConsentsIds = withoutAll(
+			this.purposes.map(({id}) => id),
 			Object.keys(this.mandatoryConsents)
 		);
 

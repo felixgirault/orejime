@@ -57,10 +57,6 @@
     "site": {
       "source": "src/site/index.html",
       "distDir": "dist-site"
-    },
-    "dsfr": {
-      "source": "src/dsfr/index.html",
-      "distDir": "dist-dsfr"
     }
   },
   "parcel-namer-rewrite": {

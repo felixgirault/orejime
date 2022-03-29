@@ -1,19 +1,19 @@
 import ConsentsEffect from './ConsentsEffect';
 import ConsentsMap from './ConsentsMap';
-import Tracker from './Tracker';
-import updateTrackerElements from './utils/updateTrackerElements';
+import Purpose from './Purpose';
+import updatePurposeElements from './utils/updatePurposeElements';
 
 export default class DomConsentsEffect implements ConsentsEffect {
-	private readonly oneShotTrackers: ConsentsMap;
+	private readonly singletonPurposes: ConsentsMap;
 	private readonly alreadyExecuted: ConsentsMap;
 
-	constructor(trackers: Tracker[]) {
-		this.oneShotTrackers = Object.fromEntries(
-			trackers.map(({id, isOneShot}) => [id, !!isOneShot])
+	constructor(purposes: Purpose[]) {
+		this.singletonPurposes = Object.fromEntries(
+			purposes.map(({id, isSingleton}) => [id, !!isSingleton])
 		);
 
 		this.alreadyExecuted = Object.fromEntries(
-			trackers.map(({id}) => [id, false])
+			purposes.map(({id}) => [id, false])
 		);
 	}
 
@@ -22,11 +22,11 @@ export default class DomConsentsEffect implements ConsentsEffect {
 			.filter(
 				([id, consent]) =>
 					!consent ||
-					!this.oneShotTrackers[id] ||
+					!this.singletonPurposes[id] ||
 					!this.alreadyExecuted?.[id]
 			)
 			.forEach(([id, consent]) => {
-				updateTrackerElements(id, consent);
+				updatePurposeElements(id, consent);
 				this.alreadyExecuted[id] = true;
 			});
 	}

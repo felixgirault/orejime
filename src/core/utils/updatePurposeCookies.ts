@@ -1,11 +1,11 @@
-import {TrackerCookie} from '../Tracker';
+import {PurposeCookie} from '../Purpose';
 import {deleteCookie, getCookieNames} from './cookies';
 import escapeRegex from './escapeRegex';
 
-export default (trackerCookies: TrackerCookie[]) => {
-	const cookies = getCookieNames();
+export default (cookies: PurposeCookie[]) => {
+	const cookieNames = getCookieNames();
 
-	trackerCookies.forEach((pattern) => {
+	cookies.forEach((pattern) => {
 		let path: string;
 		let domain: string;
 
@@ -17,7 +17,7 @@ export default (trackerCookies: TrackerCookie[]) => {
 			pattern = new RegExp(`^${escapeRegex(pattern)}$`);
 		}
 
-		cookies
+		cookieNames
 			.filter((name) => (pattern as RegExp).test(name))
 			.forEach((cookie) => {
 				deleteCookie(cookie, path, domain);

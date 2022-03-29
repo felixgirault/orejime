@@ -1,7 +1,7 @@
 import CookieOptions from './CookieOptions';
-import Tracker from './Tracker';
+import Purpose from './Purpose';
 
 export default interface Config {
 	cookie?: CookieOptions,
-	trackers: Tracker[]
+	purposes: Purpose[]
 }

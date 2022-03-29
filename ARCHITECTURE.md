@@ -13,6 +13,7 @@
 * report npmignore and test publish on a private repo
 * check each configuration var and report changes
 * update authors and meta in packages
+* use nx ?
 
 # Done
 

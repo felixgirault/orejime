@@ -1,18 +1,18 @@
 import React, {useContext} from 'react';
-import {Tracker} from '../types';
+import {Purpose} from '../types';
 import AppItem from './AppItem';
 import {InstanceContext} from './InstanceContext';
 
 interface Props {
-	trackers: Tracker[];
+	trackers: Purpose[];
 }
 
-const AppList = ({trackers}: Props) => {
+const AppList = ({purposes}: Props) => {
 	const {ns} = useContext(InstanceContext);
 
 	return (
 		<ul className={ns('AppList')}>
-			{trackers.map((app) => (
+			{purposes.map((app) => (
 				<li
 					key={`app-${app.id}`}
 					className={ns(`AppList-item AppList-item--${app.id}`)}
