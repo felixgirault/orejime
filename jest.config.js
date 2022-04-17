@@ -1,7 +1,8 @@
 module.exports = {
-  testEnvironment: 'jsdom',
-  moduleNameMapper: {
-    '^react$': 'preact/compat',
-    '^react-dom$': 'preact/compat'
-  }
+	preset: 'ts-jest/presets/js-with-ts-esm',
+	testEnvironment: 'jsdom',
+	moduleNameMapper: {
+		'^react$': 'preact/compat',
+		'^react-dom$': 'preact/compat'
+	}
 };

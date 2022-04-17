@@ -1,22 +1,12 @@
-// To create a new translation, add a YAML file with the required entries and
-// link it here using the appropriate language code.
-
-import de from './de.yml';
-import en from './en.yml';
-import fr from './fr.yml';
-import hu from './hu.yml';
-import it from './it.yml';
-import ro from './ro.yml';
-import nb from './nb.yml';
-import nl from './nl.yml';
-
 export default {
-	de,
-	en,
-	fr,
-	hu,
-	it,
-	ro,
-	nb,
-	nl
+	de: () => import('./de.yml'),
+	en: () => import('./en.yml'),
+	fi: () => import('./fi.yml'),
+	fr: () => import('./fr.yml'),
+	hu: () => import('./hu.yml'),
+	it: () => import('./it.yml'),
+	nb: () => import('./nb.yml'),
+	nl: () => import('./nl.yml'),
+	ro: () => import('./ro.yml'),
+	sv: () => import('./sv.yml')
 };

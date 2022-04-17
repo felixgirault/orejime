@@ -1,19 +1,36 @@
 # TODO
 
 * add a css classmap to allow for restyles
-* remove categories and use purposes
 * remove all unused things
-* rename app => tracker
 * check all TODO comments
-* switch to rollup
-* https://github.com/vitejs/vite/tree/main/packages/plugin-legacy
-* externalize translations
-* cleanup tsconfigs
+* clarify use of "src/ui/trackers" ??
 * report package.json info to each package
 * report npmignore and test publish on a private repo
 * check each configuration var and report changes
 * update authors and meta in packages
-* use nx ?
+* use nx ? (monorepo)
+* MIT licence ?
+
+# Rebase
+
+update preact / deps
+bundle with parcel
+  + move dist-site
+  + scss
+  + typescript
+  + jest
+  - check outputs
+add core
+rewrite standard
+  + migrate config
+  + migrate translations
+  + ambient.d.ts
+split chunks
+split translations
+add dsfr
+  + html
+add migrations
+  + html
 
 # Done
 
@@ -68,6 +85,8 @@ class Orejime {
     * persisted in cookies ("eu-consent" ?)
     * persisted in DOM
 
+DONT use translations on purposes, user should handle them itself
+
 # Interface
 
 * Use checkboxes ?
@@ -111,3 +130,37 @@ class Orejime {
 
 WARNING : React version update ?? (hooks)
  -> BREAKING
+
+
+
+# Stories
+
+As user
+
+Banner
+  should appear when consent has not been given
+  should not appear when consent has been given
+  should provide a link to the privacy policy
+  should mention the site owner and its partners
+  should provide a way to accept all cookies
+  should provide a way to decline non mandatory cookies
+  should provide a way to give consents for each purpose
+  if configured, should prevent the user from interacting with the website until they set their consent
+
+Modal
+  should inform on the way to decline previous consents
+  should show each purposes, and for each one:
+    should show a label
+    should show a decription
+    should provide an input to accept or decline cookies
+    should prevent from declining a mandatory cookie
+
+Content
+  should block embedded content for which the user did not accept related cookies
+  should provide a way to accept cookies related to a blocked embedded content and load it
+
+As a webmaster
+
+Technical
+  migration of config
+  migration of translations

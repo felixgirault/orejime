@@ -1,9 +1,4 @@
-declare module 'assign-deep' {
-	const assign: <T extends object>(...objects: T[]) => T
-	export default assign;
-}
-
 declare module '*.yml' {
-	const data: object;
+	const data: {[key: string]: any};
 	export default data;
 }

@@ -1,4 +1,4 @@
-import Tracker from './Tracker'
+import Purpose from './Purpose';
 
-type ConsentsMap = {[id: Tracker['id']]: boolean}
-export default ConsentsMap
+type ConsentsMap = {[id: Purpose['id']]: boolean};
+export default ConsentsMap;

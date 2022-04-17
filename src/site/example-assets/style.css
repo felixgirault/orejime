@@ -119,6 +119,28 @@ a:active {
 	}
 }
 
+.MigrationInput,
+.MigrationOutput {
+	box-sizing: border-box;
+	border-radius: 3px;
+	border: 1px solid currentColor;
+	width: 100%;
+	padding: calc(var(--unit) / 2);
+	color: var(--cyan-dark);
+	font: inherit;
+	font-family: monospace;
+}
+
+.MigrationOutput {
+	min-height: calc(10 * var(--unit));
+	background: var(--cyan-lighter);
+	overflow-y: auto;
+}
+
+.MigrationOutput.is-hidden {
+	display: none;
+}
+
 .Container {
 	margin: 0 auto;
 	padding-left: 1.5rem;

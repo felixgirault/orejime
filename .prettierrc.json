@@ -2,6 +2,13 @@
 	"arrowParens": "always",
 	"bracketSpacing": false,
 	"htmlWhitespaceSensitivity": "ignore",
+	"importOrder": [
+		"<THIRD_PARTY_MODULES>",
+		"^\\.\\.",
+		"^\\."
+	],
+	"importOrderSeparation": false,
+	"importOrderSortSpecifiers": true,
 	"jsxBracketSameLine": false,
 	"jsxSingleQuote": false,
 	"parser": "typescript",

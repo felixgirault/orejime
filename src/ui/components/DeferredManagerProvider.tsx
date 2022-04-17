@@ -1,25 +1,27 @@
-import React, {useContext} from 'react';
+import React, {useContext, useRef} from 'react';
 import {InstanceContext} from './InstanceContext';
 
-interface Props {
+interface DeferredManagerProviderProps {
 	children: (commit: () => void) => JSX.Element;
 }
 
-export default function DeferredManagerProvider({children}: Props) {
-	const {t, ns, config, manager} = useContext(InstanceContext);
+export default function DeferredManagerProvider({
+	children
+}: DeferredManagerProviderProps) {
+	const {manager, ...context} = useContext(InstanceContext);
 
 	// Child components manipulate this clone as it was the
 	// real thing, but we're using it as a temporary store.
 	// Its data is copied into the real one when the user
 	// explicitly saves his choices.
-	const tempManager = manager.clone();
+	const {current: deferred} = useRef(manager.clone());
 
 	const commit = () => {
-		manager.setConsents(tempManager.getAllConsents());
+		manager.setConsents(deferred.getAllConsents());
 	};
 
 	return (
-		<InstanceContext.Provider value={{t, ns, config, manager: tempManager}}>
+		<InstanceContext.Provider value={{...context, manager: deferred}}>
 			{children(commit)}
 		</InstanceContext.Provider>
 	);

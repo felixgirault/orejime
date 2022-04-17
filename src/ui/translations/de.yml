@@ -8,8 +8,7 @@ consentModal:
       Bitte lesen Sie unsere {privacyPolicy} um weitere Details zu erfahren.
 consentNotice:
   changeDescription: Es gab Änderungen seit Ihrem letzten Besuch, bitte aktualisieren Sie Ihre Auswahl.
-  description: >
-    Wir speichern und verarbeiten Ihre personenbezogenen Informationen für folgende Zwecke: {purposes}.
+  description: Wir speichern und verarbeiten Ihre personenbezogenen Informationen.
   learnMore: Mehr erfahren
 save: Speichern
 decline: Ablehnen

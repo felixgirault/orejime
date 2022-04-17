@@ -1,16 +1,32 @@
-import {setup} from '../core';
-import type {Config} from '../ui';
+import setup from '../core/setup';
+import type {Config, Translations} from '../ui';
+import translationImports from '../ui/translations';
+import {purposesOnly} from '../ui/utils/config';
+import {deepMerge} from '../ui/utils/objects';
 import umd from '../umd';
 
 umd(async (config: Config) => {
-	const manager = setup(config);
-	const preload = () => {
-		import('../ui');
-	};
+	const manager = setup(purposesOnly(config.purposes), config.cookie);
+
+	const preload = () => import('../ui');
 
 	const loadUi = async () => {
-		const setupUi = (await import('../ui')).setup;
-		return setupUi(config, manager);
+		const [ui, translations] = await Promise.all([
+			import('../ui'),
+			//import(`../ui/translations/${config.lang || 'en'}.yml`)
+			//*/
+			translationImports[
+				(config.lang || 'en') as keyof typeof translationImports
+			]
+			//*/
+		]);
+
+		return ui.setup(
+			deepMerge(config, {
+				translations: (await translations()) as unknown as Translations
+			} as Config),
+			manager
+		);
 	};
 
 	const show = async () => {

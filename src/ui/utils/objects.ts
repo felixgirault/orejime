@@ -1,24 +1,21 @@
-interface DeepObject<T> {
-	[key: string]: T | DeepObject<T>;
-}
+const isObject = (obj) => obj && typeof obj === 'object';
 
-export function getDeep<T>(
-	map: DeepObject<T>,
-	path: string[],
-	defaultValue?: T
-): T | undefined {
-	let value: T | DeepObject<T> = map;
+// @see https://stackoverflow.com/a/48218209/2391359
+export const deepMerge = <T extends object>(...objects: T[]) => {
+	return objects.reduce((prev, obj) => {
+		Object.keys(obj).forEach((key) => {
+			const pVal = prev[key];
+			const oVal = obj[key];
 
-	for (const key of path) {
-		if (!(key in value)) {
-			return defaultValue;
-		}
+			if (Array.isArray(pVal) && Array.isArray(oVal)) {
+				prev[key] = pVal.concat(...oVal);
+			} else if (isObject(pVal) && isObject(oVal)) {
+				prev[key] = deepMerge(pVal, oVal);
+			} else {
+				prev[key] = oVal;
+			}
+		});
 
-		value = (value as DeepObject<T>)[key];
-	}
-
-	return value as T;
-}
-
-export const indexBy = <T>(array: T[], key: keyof T) =>
-	Object.fromEntries(array.map((obj) => [obj[key], obj]));
+		return prev;
+	}, {} as T);
+};

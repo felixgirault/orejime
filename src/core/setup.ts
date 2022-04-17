@@ -1,14 +1,15 @@
-import Config from './Config';
 import CookieConsentsRepository from './CookieConsentsRepository';
+import CookieOptions from './CookieOptions';
 import CookiesConsentsEffect from './CookiesConsentsEffect';
 import DomConsentsEffect from './DomConsentsEffect';
 import Manager from './Manager';
+import Purpose from './Purpose';
 
-export default (config: Config) => {
-	const domEffect = new DomConsentsEffect(config.trackers);
-	const cookiesEffect = new CookiesConsentsEffect(config.trackers);
-	const repository = new CookieConsentsRepository(config.cookie);
-	const manager = new Manager(config.trackers, repository.read());
+export default (purposes: Purpose[], cookie: CookieOptions) => {
+	const domEffect = new DomConsentsEffect(purposes);
+	const cookiesEffect = new CookiesConsentsEffect(purposes);
+	const repository = new CookieConsentsRepository(cookie);
+	const manager = new Manager(purposes, repository.read());
 
 	manager.on('update', (diff, all) => {
 		domEffect.apply(diff);

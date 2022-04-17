@@ -12,6 +12,7 @@
 
 		<link rel="stylesheet" href="../scss/orejime.scss" />
 		<link rel="stylesheet" href="./example-assets/style.css" />
+		<link rel="stylesheet" href="../../node_modules/@gouvfr/dsfr/dist/dsfr/dsfr.min.css">
 
 		<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
 	</head>
@@ -70,10 +71,23 @@
 						</p>
 
 						<div class="ButtonGroup">
-							<button type="button" class="Button consent-modal-button" data-orejime-preload>Open consent modal</button>
-							<button type="button" class="Button reset-button" data-orejime-preload>Reset consent</button>
+							<button type="button" class="Button" data-orejime-preload data-orejime-open>Open consent modal</button>
+							<button type="button" class="Button" data-orejime-preload data-orejime-reset>Reset consent</button>
 						</div>
 					</div>
+
+					<h2 class="Inset-title">Embedded content example</h2>
+
+					<iframe
+						data-src="https://www.youtube.com/embed/iMD3pWAFXEY"
+						data-name="youtube"
+						width="560"
+						height="315"
+						title="YouTube video player"
+						frameborder="0"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+						allowfullscreen
+					></iframe>
 
 					<h2 class="Inset-title">They're using Orejime</h2>
 
@@ -135,81 +149,48 @@
 			// see the annotated config in the README for details on how everything works
 			window.orejimeConfig = {
 				appElement: "#app",
-				privacyPolicy: "#privacyPolicy",
+				privacyPolicyUrl: "#privacyPolicy",
 				translations: {
 					en: {
 						consentModal: {
 							description: "Here is an example of Orejime. View the source code to see how everything is done.",
-						},
-						"inline-tracker": {
-							description: "Example of an inline tracking script that sets a dummy cookie",
-						},
-						"external-tracker": {
-							description: "Example of an external tracking script that sets a dummy cookie",
-						},
-						"always-on": {
-							description: "This <a href=\"http://example.com\">example</a> app will not set any cookie",
-						},
-						"disabled-by-default": {
-							description: "This example app will not set any cookie",
-						},
-						purposes: {
-							analytics: "Analytics",
-							security: "Security",
-							ads: "Ads"
-						},
-						categories: {
-							example: {
-								description: 'Applications can be grouped into categories to help users better understand their use.'
-							},
-							"third-party": {
-								description: 'These are fake third-party applications.'
-							}
 						}
 					},
 				},
-				trackers: [
+				purposes: [
 					{
-						id: "inline-tracker",
-						name: "inline-tracker",
-						title: "Inline Tracker",
-						purposes: ["analytics"],
-						cookies: ["inline-tracker"]
-					},
-					{
-						id: "external-tracker",
-						name: "external-tracker",
-						title: "External Tracker",
-						purposes: ["analytics", "security"],
-						cookies: ["external-tracker"],
-						isMandatory: true
+						id: "advertising",
+						title: "Advertising",
+						description: "Things related to advertising.",
+						purposes: [
+							{
+								id: "inline-tracker",
+								name: "inline-tracker",
+								title: "Inline Tracker",
+								cookies: ["inline-tracker"]
+							},
+							{
+								id: "external-tracker",
+								name: "external-tracker",
+								title: "External Tracker",
+								cookies: ["external-tracker"],
+								isMandatory: true
+							}
+						]
 					},
 					{
 						id: "disabled-by-default",
 						name: "disabled-by-default",
 						title: "Something disabled by default",
-						purposes: ["ads"],
+						description: "This <a href=\"http://example.com\">example</a> app will not set any cookie",
 						default: false
 					},
 					{
 						id: "always-on",
 						name: "always-on",
 						title: "Required app",
-						purposes: [],
-						required: true,
+						description: "This example app will not set any cookie",
 						isMandatory: true
-					}
-				],
-				categories: [
-					{
-						name: 'example',
-						title: 'Example category',
-						apps: ['inline-tracker', 'disabled-by-default']
-					},
-					{
-						name: 'third-party',
-						title: 'Third-party applications',
-						apps: ['external-tracker', 'always-on']
 					}
 				]
 			}
@@ -217,7 +198,7 @@
 
 		<!-- since there is a orejimeConfig global variable in index.js, a window.orejime instance will be initiated when including the lib -->
 		<script type="module" src="../app/orejime.ts" defer></script>
-
+		<script src="example-assets/buttons.js"></script>
 		<script src="example-assets/setCookie.js"></script>
 
 		<script
@@ -234,51 +215,6 @@
 		>
 			console.log("This is an example of an inline tracking script.")
 			setCookie("inline-tracker", "foo", 120)
-		</script>
-
-		<script>
-			/*
-			const blacklist = ['foo'];
-			const desc = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie') ||
-      		Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'cookie')
-
-			Object.defineProperty(document, 'cookie', {
-				configurable: true,
-				enumerable: cookieDesc.enumerable,
-				get: function () {
-					return cookieDesc.get.call(document);
-				},
-				set: function (cookie) {
-					const name = cookie.parse
-
-
-
-					cookieDesc.set.call(document, cookie);
-				}
-			});
-
-			document.cookie = 'foo=12';
-			document.cookie = 'bar=15';
-			console.log(document.cookie);
-			*/
-
-			// since there is a orejimeConfig global variable in index.js,
-			// a window.orejime instance was created when including the lib
-			document.querySelector('.consent-modal-button').addEventListener('click', function() {
-				window.orejime.show();
-			});
-
-			document.querySelector('.reset-button').addEventListener('click', function() {
-				window.orejime.manager.clearConsents();
-			});
-
-			document.querySelector('[data-orejime-preload]').addEventListener('focus', function() {
-				window.orejime.preload();
-			});
-
-			document.querySelector('[data-orejime-preload]').addEventListener('mouseover', function() {
-				window.orejime.preload();
-			});
 		</script>
 	</body>
 </html>

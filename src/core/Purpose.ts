@@ -1,4 +1,3 @@
-
 export type PurposeCookieProps = [
 	pattern: RegExp,
 	path: string,
@@ -9,9 +8,8 @@ export type PurposeCookie = string | RegExp | PurposeCookieProps;
 
 export default interface Purpose {
 	id: string;
-	childIds: string[];
 	cookies: PurposeCookie[];
-	default?: true;
+	default?: boolean;
 	isMandatory?: boolean;
 	isSingleton?: boolean;
 }

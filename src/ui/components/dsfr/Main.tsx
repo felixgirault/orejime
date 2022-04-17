@@ -1,59 +1,61 @@
-import React from 'react';
-import {ConsentManager, ConsentService} from '@dataesr/react-dsfr';
-import withMain from '../containers/withMain';
+import React, {useContext} from 'react';
+import {Translations} from '../../types';
+import {useIsDirty} from '../../utils/hooks';
+import DeferredManagerProvider from '../DeferredManagerProvider';
+import {InstanceContext} from '../InstanceContext';
+import type {MainComponentProps} from '../Root';
+import Banner from './Banner';
+import Modal from './Modal';
+import PurposeList from './PurposeList';
+
+interface MainProps extends MainComponentProps {
+	t: Translations;
+}
 
 const Main = ({
+	t,
 	isBannerOpen,
 	isModalOpen,
 	openModal,
 	closeModal,
+	// TODO move out ?
 	onAcceptAll,
-	onDeclineAll,
-	onUpdateConsents
-}) => {
-	return (
-		<ConsentManager
-			bannerDescription="Bienvenue ! Nous utilisons des cookies pour améliorer votre expérience utilisateur"
-			bannerTitle="À propos des cookies sur dataesr/react-dsfr.fr"
-			isModalOpen={isModalOpen}
-			setIsModalOpen={(open) => (open ? closeModal() : openModal())}
-			modalTitle="Panneau de gestion des cookies"
-			modalCloseLabel="Fermer"
-			modalCloseTitle="fermer la modal cookie"
-			confirmButtonLabel="Confirmer mes choix"
-			isBannerOpen={isBannerOpen}
-			bannerButtons={{
-				accept: {
-					label: 'Tout Accepter'
-				},
-				refuse: {
-					label: 'Tout Refuser'
-				},
-				customize: {
-					label: 'Personnaliser'
-				}
-			}}
-			confirmConsent={onUpdateConsents}
-			refuseBannerButton={onDeclineAll}
-			acceptBannerButton={onAcceptAll}
-		>
-			<ConsentService
-				description=""
-				title="Préférences pour tous les services."
-				acceptLabel="Tout accepter"
-				refuseLabel="Tout refuser"
-				defaultConsent="refuse"
-			/>
+	onDeclineAll
+}: MainProps) => {
+	const {config} = useContext(InstanceContext);
+	const isDirty = useIsDirty();
 
-			<ConsentService
-				description="Ce site utilise des cookies nécessaires à son bon fonctionnement qui ne peuvent pas être désactivés."
-				title="Cookies obligatoires"
-				acceptLabel="Accepter"
-				refuseLabel="Refuser"
-				defaultConsent="accept"
-			/>
-		</ConsentManager>
+	return (
+		<>
+			{isBannerOpen ? (
+				<Banner
+					t={t.banner}
+					isDirty={isDirty}
+					isModalOpen={isModalOpen}
+					privacyPolicyUrl={config.privacyPolicyUrl}
+					onAccept={onAcceptAll}
+					onDecline={onDeclineAll}
+					onConfigure={openModal}
+				/>
+			) : null}
+
+			{isModalOpen ? (
+				<DeferredManagerProvider>
+					{(commit) => (
+						<Modal
+							t={t.modal}
+							isDirty={isDirty}
+							isOpen={isModalOpen}
+							onSave={commit}
+							onClose={closeModal}
+						>
+							<PurposeList t={t} />
+						</Modal>
+					)}
+				</DeferredManagerProvider>
+			) : null}
+		</>
 	);
 };
 
-export default withMain(Main);
+export default Main;

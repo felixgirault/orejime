@@ -1,7 +1,7 @@
-import {getCookie, setCookie, deleteCookie} from './utils/cookies';
 import ConsentsMap from './ConsentsMap';
 import ConsentsRepository from './ConsentsRepository';
 import CookieOptions from './CookieOptions';
+import {deleteCookie, getCookie, setCookie} from './utils/cookies';
 
 export default class CookieConsentsRepository implements ConsentsRepository {
 	private options: CookieOptions;

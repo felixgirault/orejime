@@ -39,14 +39,14 @@ export default class Manager extends EventEmitter<ManagerEvents> {
 
 		this.defaultConsents = defaultConsents(purposes);
 		this.mandatoryConsents = acceptedConsents(
-			this.purposes.filter(({isMandatory}) => isMandatory)
+			purposes.filter(({isMandatory}) => isMandatory)
 		);
 
 		this.purposes = purposes;
 		this.consents = overwrite(this.defaultConsents, consents);
 	}
 
-	// Clones data, but no event handlers.
+	// Clones data, but not event handlers.
 	clone() {
 		return new Manager(this.purposes, this.getAllConsents());
 	}

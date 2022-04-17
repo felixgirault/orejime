@@ -1,11 +1,14 @@
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import ReactModal from 'react-modal';
 import type {Props as ReactModalProps} from 'react-modal';
+import {ElementReference} from '../types';
+import {getElement} from '../utils/dom';
+import {useBeforeRender} from '../utils/hooks';
 
-interface Props extends ReactModalProps {
+interface DialogProps extends Omit<ReactModalProps, 'appElement'> {
 	isOpen: boolean;
-	elementId: string;
-	appElement?: HTMLElement;
+	appElement?: ElementReference;
+	containerElement?: ElementReference;
 	children: any;
 
 	// the scroll position stuff is for iOS to work correctly
@@ -32,13 +35,19 @@ interface Props extends ReactModalProps {
 
 export default function Dialog({
 	isOpen,
-	elementId,
 	appElement,
+	containerElement,
 	handleScrollPosition = true,
 	children,
 	...reactModalProps
-}: Props) {
+}: DialogProps) {
 	const [scrollPosition, setScrollPosition] = useState<number | null>(null);
+
+	useBeforeRender(() => {
+		if (appElement) {
+			ReactModal.setAppElement(appElement);
+		}
+	});
 
 	useLayoutEffect(() => {
 		if (isOpen && scrollPosition === null) {
@@ -59,21 +68,11 @@ export default function Dialog({
 		}
 	});
 
-	useEffect(() => {
-		if (appElement) {
-			ReactModal.setAppElement(appElement);
-		}
-	}, []);
-
 	return (
 		<ReactModal
-			isOpen={isOpen}
-			parentSelector={() =>
-				document.getElementById(elementId) as HTMLElement
-			}
-			htmlOpenClassName="orejimeHtml-WithModalOpen"
-			bodyOpenClassName="orejimeBody-WithModalOpen"
 			{...reactModalProps}
+			isOpen={isOpen}
+			parentSelector={() => getElement(containerElement)}
 		>
 			{children}
 		</ReactModal>

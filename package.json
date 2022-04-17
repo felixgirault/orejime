@@ -15,19 +15,23 @@
     "cookie",
     "consent",
     "gdpr",
-    "compliance"
+    "compliance",
+    "accessibility"
   ],
-  "author": "Emmanuel Pelletier <e.pelletier@empreintedigitale.fr>",
+  "author": "Empreinte digitale <orejime@empreintedigitale.coop>",
   "contributors": [
-    "Félix Girault <felix.girault@empreintedigitale.coop>"
+    "Félix Girault <felix.girault@empreintedigitale.coop>",
+    "Emmanuel Pelletier <e.pelletier@empreintedigitale.coop>"
   ],
   "license": "BSD-3-Clause",
   "scripts": {
     "start": "parcel serve --target site",
     "start-dsfr": "parcel serve --target dsfr",
-    "serve": "http-server dist --gzip --brotli",
-    "build": "npm run clean-build && parcel build --no-cache",
-    "clean-build": "rm -Rf ./dist/orejime*"
+    "serve": "http-server dist-site --gzip --brotli",
+    "test": "jest src",
+    "build": "npm run clean-build && parcel build --no-cache --log-level verbose",
+    "analyse": "npm run clean-build && parcel build --no-cache --log-level verbose --reporter @parcel/reporter-bundle-analyzer",
+    "clean-build": "rm -Rf ./dist/*"
   },
   "browser": "dist/orejime.js",
   "legacy": "dist/orejime.js",
@@ -47,7 +51,6 @@
     "modern": {
       "context": "browser",
       "source": "src/app/orejime.ts",
-      "outputFormat": "esmodule",
       "includeNodeModules": true,
       "optimize": true,
       "engines": {
@@ -55,7 +58,11 @@
       }
     },
     "site": {
-      "source": "src/site/index.html",
+      "source": [
+        "src/site/index.html",
+        "src/site/dsfr.html",
+        "src/site/migration.html"
+      ],
       "distDir": "dist-site"
     }
   },
@@ -69,22 +76,26 @@
     "react-dom": "preact/compat"
   },
   "dependencies": {
-    "assign-deep": "^1.0.1",
     "js-cookie": "^3.0.1",
     "preact": "^10.6.3",
     "react-modal": "^3.14.4"
   },
   "devDependencies": {
     "@gouvfr/dsfr": "^1.2.1",
-    "@parcel/transformer-sass": "^2.0.1",
-    "@parcel/transformer-yaml": "^2.0.1",
-    "@types/jest": "^27.0.3",
+    "@parcel/reporter-bundle-analyzer": "^2.4.1",
+    "@parcel/transformer-sass": "^2.4.1",
+    "@parcel/transformer-yaml": "^2.4.1",
+    "@trivago/prettier-plugin-sort-imports": "^3.2.0",
+    "@types/jest": "^27.4.1",
+    "@types/js-cookie": "^3.0.1",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "@types/react-modal": "^3.13.1",
     "http-server": "^14.0.0",
     "jest": "^27.4.3",
-    "parcel": "^2.0.1",
-    "parcel-namer-rewrite": "^2.0.0-rc.1"
+    "parcel": "^2.4.1",
+    "parcel-namer-rewrite": "^2.0.0-rc.1",
+    "ts-jest": "^27.1.4",
+    "typescript": "^4.6.3"
   }
 }

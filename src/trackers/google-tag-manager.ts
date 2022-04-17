@@ -1,12 +1,10 @@
-import {cookies, CookiesParams} from './helpers/google'
+import {CookiesParams, cookies} from './helpers/google';
 
-
-
-export default function(params: CookiesParams) {
+export default function (params: CookiesParams) {
 	return {
 		name: 'google-tag-manager',
-		title : 'Google Tag Manager',
-		purposes : ['analytics'],
+		title: 'Google Tag Manager',
+		purposes: ['analytics'],
 		cookies: cookies(params)
-	}
+	};
 }
