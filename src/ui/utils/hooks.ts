@@ -1,5 +1,5 @@
 import {useContext, useEffect, useRef, useState} from 'react';
-import {Purpose} from '../../core';
+import type {Purpose} from '../../core';
 import ConsentsMap from '../../core/ConsentsMap';
 import {
 	acceptedConsents,
@@ -30,7 +30,12 @@ export const useIsDirty = () => {
 export const useBannerState = () => {
 	const {config} = useContext(InstanceContext);
 	const isDirty = useIsDirty();
-	return config.forceConsent || config.noBanner ? false : isDirty;
+
+	if (!isDirty) {
+		return false;
+	}
+
+	return config.forceConsent ? false : isDirty;
 };
 
 export const useModalState = (): [
@@ -38,17 +43,24 @@ export const useModalState = (): [
 	open: () => void,
 	close: () => void
 ] => {
-	const {config} = useContext(InstanceContext);
-	const isDirty = useIsDirty();
-	const shouldShowModal = () => config.forceConsent && isDirty;
+	const {config, manager} = useContext(InstanceContext);
 
-	const [isOpen, setOpen] = useState(shouldShowModal());
+	// We're ready `isDirty` from the manager instead of using
+	// the `useIsDirty` hook, because we need the state to be
+	// in sync when trying to close the modal below.
+	// Using the hook leads to kind of a race condition
+	// because we have to wait for a rerender to get the actual
+	// value, but the manager could be updated during this
+	// short window.
+	const mustOpen = () => config.forceConsent && manager.isDirty();
+
+	const [isOpen, setOpen] = useState(mustOpen());
 	const open = () => {
 		setOpen(true);
 	};
 
 	const close = () => {
-		setOpen(shouldShowModal());
+		setOpen(mustOpen());
 	};
 
 	return [isOpen, open, close];
@@ -62,7 +74,6 @@ export const useGroupStates = (purposes: Purpose[]) => {
 	]);
 
 	const update = (_: ConsentsMap, consents: ConsentsMap) => {
-		console.log('update', purposes, consents);
 		setStates([
 			areAllPurposesEnabled(purposes, consents),
 			areAllPurposesDisabled(purposes, consents)

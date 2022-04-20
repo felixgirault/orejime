@@ -1,6 +1,6 @@
 import {createContext} from 'react';
-import {Manager} from '../../core';
-import {Config} from '../types';
+import type {Manager} from '../../core';
+import type {Config} from '../types';
 
 export interface InstanceContextType {
 	config: Config;

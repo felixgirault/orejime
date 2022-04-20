@@ -1,5 +1,5 @@
 import React from 'react';
-import {ModalTranslations} from '../types';
+import type {ModalTranslations} from '../types';
 import {template} from '../utils/template';
 
 interface PoweredByLinkProps {

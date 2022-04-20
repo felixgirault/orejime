@@ -1,7 +1,7 @@
 import ConsentsEffect from './ConsentsEffect';
 import ConsentsMap from './ConsentsMap';
 import Purpose from './Purpose';
-import indexBy from './utils/indexBy';
+import {indexBy} from './utils/arrays';
 import updatePurposeCookies from './utils/updatePurposeCookies';
 
 export default class CookiesConsentsEffect implements ConsentsEffect {

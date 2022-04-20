@@ -1,32 +1,36 @@
 import type {ForwardRefRenderFunction} from 'react';
 import {forwardRef, useContext, useImperativeHandle} from 'react';
-import {useBannerState, useModalState} from '../utils/hooks';
+import type {Translations} from '../types';
+import {useBannerState, useIsDirty, useModalState} from '../utils/hooks';
+import DeferredManagerProvider from './DeferredManagerProvider';
 import {InstanceContext} from './InstanceContext';
-
-export interface MainComponentProps {
-	isBannerOpen: boolean;
-	isModalOpen: boolean;
-	openModal: () => void;
-	closeModal: () => void;
-	onAcceptAll: () => void;
-	onDeclineAll: () => void;
-}
+import PurposeList from './PurposeList';
+import type {BannerComponent} from './types/Banner';
+import type {ModalComponent} from './types/Modal';
+import type {ModalBannerComponent} from './types/ModalBanner';
+import type {PurposeComponent} from './types/Purpose';
 
 interface RootHandle {
 	openModal: () => void;
 }
 
 interface RootProps {
-	children: (props: MainComponentProps) => JSX.Element;
+	translations: Translations;
+	Banner: BannerComponent;
+	ModalBanner: ModalBannerComponent;
+	Modal: ModalComponent;
+	Purpose: PurposeComponent;
 }
 
 const Root: ForwardRefRenderFunction<RootHandle, RootProps> = (
-	{children: renderChild},
+	{translations, Banner, ModalBanner, Modal, Purpose},
 	ref
 ) => {
-	const {manager} = useContext(InstanceContext);
+	const {config, manager} = useContext(InstanceContext);
+	const isDirty = useIsDirty();
 	const isBannerOpen = useBannerState();
 	const [isModalOpen, openModal, closeModal] = useModalState();
+	const BannerComponent = config.preventNavigation ? ModalBanner : Banner;
 
 	const handleAcceptAll = () => {
 		manager.acceptAll();
@@ -43,14 +47,42 @@ const Root: ForwardRefRenderFunction<RootHandle, RootProps> = (
 		openModal
 	}));
 
-	return renderChild({
-		isBannerOpen,
-		isModalOpen,
-		openModal,
-		closeModal,
-		onAcceptAll: handleAcceptAll,
-		onDeclineAll: handleDeclineAll
-	});
+	return (
+		<>
+			{isBannerOpen ? (
+				<BannerComponent
+					translations={translations.banner}
+					commonTranslations={translations.common}
+					isDirty={isDirty}
+					isHidden={isModalOpen}
+					privacyPolicyUrl={config.privacyPolicyUrl}
+					onAccept={handleAcceptAll}
+					onDecline={handleDeclineAll}
+					onConfigure={openModal}
+				/>
+			) : null}
+
+			{isModalOpen ? (
+				<DeferredManagerProvider onCommit={closeModal}>
+					{(commit) => (
+						<Modal
+							translations={translations.modal}
+							commonTranslations={translations.common}
+							isForced={config.forceConsent && isDirty}
+							privacyPolicyUrl={config.privacyPolicyUrl}
+							onSave={commit}
+							onClose={closeModal}
+						>
+							<PurposeList
+								translations={translations}
+								Purpose={Purpose}
+							/>
+						</Modal>
+					)}
+				</DeferredManagerProvider>
+			) : null}
+		</>
+	);
 };
 
 export default forwardRef(Root);

@@ -1,33 +1,36 @@
+common:
+  dirtyNotice: There were changes since your last visit, please update your consent.
 banner:
   title: Information that we collect
-  description: We collect and process your personal information.
-  privacyPolicy: To learn more, please read our {privacyPolicy}.
-  privacyPolicyTitle: privacy policy
+  description: We collect and process your personal information. To learn more, please read our {privacyPolicy}.
+  privacyPolicyLabel: privacy policy
   accept: Accept
   acceptTitle: Accept cookies
   decline: Decline
   declineTitle: Decline all apps
   configure: Learn more
   configureTitle:
-  dirtyNotice: There were changes since your last visit, please update your consent.
 modal:
   title: Information that we collect
-  description: Here you can see and customize the information that we collect about you.
+  description: Here you can see and customize the information that we collect about you. To learn more, please read our {privacyPolicy}.
+  privacyPolicyLabel: privacy policy
   close: Close
   closeTitle: Close
   globalPreferences: Global preferences
   acceptAll: Accept all
   declineAll: Decline all
   save: Confirm my choices
+  saveTitle: Sauvegarder ma configuration sur les informations collectées
   poweredBy: Powered by {name}
   newWindowTitle: new window
 purpose:
   mandatory: (always required)
+  mandatoryTitle: Cette application est toujours requise
+  optOut: (opt-out)
+  optOutTitle: This app is loaded by default (but you can opt out)
   showMore: See more details
   accept: Accept
   decline: Decline
-misc:
-
 
 
 

@@ -1,16 +1,12 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
 import ReactModal from 'react-modal';
 import type {Props as ReactModalProps} from 'react-modal';
-import {ElementReference} from '../types';
 import {getElement} from '../utils/dom';
 import {useBeforeRender} from '../utils/hooks';
+import {InstanceContext} from './InstanceContext';
 
-interface DialogProps extends Omit<ReactModalProps, 'appElement'> {
-	isOpen: boolean;
-	appElement?: ElementReference;
-	containerElement?: ElementReference;
-	children: any;
-
+interface DialogProps extends Omit<ReactModalProps, 'appElement' | 'isOpen'> {
+	isAlert?: boolean;
 	// the scroll position stuff is for iOS to work correctly
 	// when we want to prevent normal website scrolling with
 	// the modal opened
@@ -31,32 +27,32 @@ interface DialogProps extends Omit<ReactModalProps, 'appElement'> {
 	// }
 	// ```
 	handleScrollPosition?: boolean;
+	children: any;
 }
 
-export default function Dialog({
-	isOpen,
-	appElement,
-	containerElement,
+const Dialog = ({
+	isAlert = false,
 	handleScrollPosition = true,
 	children,
 	...reactModalProps
-}: DialogProps) {
+}: DialogProps) => {
+	const {config} = useContext(InstanceContext);
 	const [scrollPosition, setScrollPosition] = useState<number | null>(null);
 
 	useBeforeRender(() => {
-		if (appElement) {
-			ReactModal.setAppElement(appElement);
+		if (config?.appElement) {
+			ReactModal.setAppElement(config.appElement);
 		}
 	});
 
 	useLayoutEffect(() => {
-		if (isOpen && scrollPosition === null) {
+		if (scrollPosition === null) {
 			setScrollPosition(window.pageYOffset);
 		}
 	});
 
 	useEffect(() => {
-		if (!isOpen && scrollPosition !== null) {
+		if (scrollPosition !== null) {
 			// setTimeout() avoids a race condition of some sort
 			setTimeout(() => {
 				if (handleScrollPosition) {
@@ -71,10 +67,13 @@ export default function Dialog({
 	return (
 		<ReactModal
 			{...reactModalProps}
-			isOpen={isOpen}
-			parentSelector={() => getElement(containerElement)}
+			parentSelector={() => getElement(config.orejimeElement)}
+			role={isAlert ? 'alertdialog' : 'dialog'}
+			isOpen
 		>
 			{children}
 		</ReactModal>
 	);
-}
+};
+
+export default Dialog;

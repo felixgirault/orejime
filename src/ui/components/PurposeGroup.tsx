@@ -1,30 +1,33 @@
 import React from 'react';
-import type {PurposeTranslations, Purpose as PurposeType} from '../../types';
-import {useGroupActions, useGroupStates} from '../../utils/hooks';
-import Purpose, {ConsentState} from './Purpose';
+import type {PurposeTranslations, Purpose as PurposeType} from '../types';
+import {useGroupActions, useGroupStates} from '../utils/hooks';
 import PurposeContainer from './PurposeContainer';
+import {ConsentState} from './types/ConsentState';
+import type {PurposeComponent} from './types/Purpose';
 
 export interface PurposeGroupProps {
-	t: PurposeTranslations;
+	translations: PurposeTranslations;
 	id: string;
 	title: string;
 	description: string;
 	purposes: PurposeType[];
+	Purpose: PurposeComponent;
 }
 
 const PurposeGroup = ({
-	t,
+	translations,
 	id,
 	title,
 	description,
-	purposes
+	purposes,
+	Purpose
 }: PurposeGroupProps) => {
 	const [areAllEnabled, areAllDisabled] = useGroupStates(purposes);
 	const [acceptAll, declineAll] = useGroupActions(purposes);
 
 	return (
 		<Purpose
-			t={t}
+			translations={translations}
 			name={id}
 			label={title}
 			description={description}
@@ -38,7 +41,11 @@ const PurposeGroup = ({
 			onChange={(consent) => (consent ? acceptAll() : declineAll())}
 		>
 			{purposes.map((purpose) => (
-				<PurposeContainer t={t} purpose={purpose as PurposeType} />
+				<PurposeContainer
+					translations={translations}
+					purpose={purpose as PurposeType}
+					Purpose={Purpose}
+				/>
 			))}
 		</Purpose>
 	);

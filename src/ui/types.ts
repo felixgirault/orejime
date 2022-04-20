@@ -21,22 +21,26 @@ export interface PurposeGroup {
 
 export type PurposeList = Array<PurposeGroup | Purpose>;
 
+export interface CommonTranslations {
+	changesNotice: string;
+}
+
 export interface BannerTranslations {
-	title: string;
+	title?: string;
 	description: string;
-	privacyPolicy: string;
-	privacyPolicyTitle: string;
+	privacyPolicyLabel: string;
 	accept: string;
-	acceptTitle: string;
+	acceptTitle?: string;
 	decline: string;
-	declineTitle: string;
+	declineTitle?: string;
 	configure: string;
-	configureTitle: string;
-	dirtyNotice: string;
+	configureTitle?: string;
 }
 
 export interface ModalTranslations {
 	title: string;
+	description: string;
+	privacyPolicyLabel: string;
 	close: string;
 	closeTitle: string;
 	globalPreferences: string;
@@ -51,18 +55,27 @@ export interface ModalTranslations {
 export interface PurposeTranslations {
 	mandatory: string;
 	mandatoryTitle: string;
+	optOut: string;
+	optOutTitle: string;
 	showMore: string;
 	accept: string;
 	decline: string;
 }
 
 export interface Translations {
+	common: CommonTranslations;
 	banner: BannerTranslations;
 	modal: ModalTranslations;
 	purpose: PurposeTranslations;
 }
 
 export type ElementReference = string | HTMLElement;
+export type ImageAttributes = {
+	src: string;
+	alt: string;
+};
+
+export type ImageDescriptor = string | ImageAttributes;
 
 export interface Config {
 	appElement?: ElementReference;
@@ -71,16 +84,9 @@ export interface Config {
 	defaultConsent: boolean; // TODO handle this (remove ??)
 	lang: string;
 	// TODO handle this
-	logo:
-		| boolean
-		| string
-		| {
-				alt: string;
-				src: string;
-		  };
+	logo?: ImageDescriptor;
 	forceConsent: boolean;
-	forceNotice: boolean;
-	noBanner?: boolean; // TODO handle this (remove ??)
+	preventNavigation: boolean;
 	privacyPolicyUrl: string;
 	stylePrefix: string; // TODO handle this
 	cookie?: CookieOptions;

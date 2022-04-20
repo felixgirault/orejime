@@ -1,8 +1,8 @@
 import ConsentsMap from './ConsentsMap';
 import EventEmitter from './EventEmitter';
 import Purpose from './Purpose';
-import diff from './utils/diff';
-import overwrite from './utils/overwrite';
+import {withoutAll} from './utils/arrays';
+import {diff, overwrite} from './utils/objects';
 import {
 	acceptedConsents,
 	areAllPurposesDisabled,
@@ -12,7 +12,6 @@ import {
 	defaultConsents,
 	isConsentValid
 } from './utils/purposes';
-import withoutAll from './utils/withoutAll';
 
 type ManagerEvents = {
 	dirty: (dirty: boolean) => void;

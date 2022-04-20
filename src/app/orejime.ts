@@ -13,12 +13,9 @@ umd(async (config: Config) => {
 	const loadUi = async () => {
 		const [ui, translations] = await Promise.all([
 			import('../ui'),
-			//import(`../ui/translations/${config.lang || 'en'}.yml`)
-			//*/
 			translationImports[
 				(config.lang || 'en') as keyof typeof translationImports
 			]
-			//*/
 		]);
 
 		return ui.setup(

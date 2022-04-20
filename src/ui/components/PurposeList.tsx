@@ -1,15 +1,17 @@
 import React, {useContext} from 'react';
-import {Purpose as PurposeType, Translations} from '../../types';
-import {InstanceContext} from '../InstanceContext';
-import Purpose, {ConsentState} from './Purpose';
+import type {Purpose as PurposeType, Translations} from '../types';
+import {InstanceContext} from './InstanceContext';
 import PurposeContainer from './PurposeContainer';
 import PurposeGroup from './PurposeGroup';
+import {ConsentState} from './types/ConsentState';
+import {PurposeComponent} from './types/Purpose';
 
 interface PurposeListProps {
-	t: Translations;
+	translations: Translations;
+	Purpose: PurposeComponent;
 }
 
-const PurposeList = ({t}: PurposeListProps) => {
+const PurposeList = ({translations, Purpose}: PurposeListProps) => {
 	const {config, manager} = useContext(InstanceContext);
 
 	return (
@@ -17,8 +19,8 @@ const PurposeList = ({t}: PurposeListProps) => {
 			{config.purposes.length > 1 ? (
 				<Purpose
 					isHeader
-					name="all"
-					label={t.modal.globalPreferences}
+					name="orejime-all"
+					label={translations.modal.globalPreferences}
 					consent={
 						manager.areAllPurposesEnabled()
 							? ConsentState.accepted
@@ -29,10 +31,10 @@ const PurposeList = ({t}: PurposeListProps) => {
 					onChange={(consent) =>
 						consent ? manager.acceptAll() : manager.declineAll()
 					}
-					t={{
-						...t.purpose,
-						accept: t.modal.acceptAll,
-						decline: t.modal.declineAll
+					translations={{
+						...translations.purpose,
+						accept: translations.modal.acceptAll,
+						decline: translations.modal.declineAll
 					}}
 				/>
 			) : null}
@@ -40,16 +42,18 @@ const PurposeList = ({t}: PurposeListProps) => {
 			{config.purposes.map((purpose) =>
 				'purposes' in purpose ? (
 					<PurposeGroup
-						t={t.purpose}
+						translations={translations.purpose}
 						id={purpose.id}
 						title={purpose.title}
 						description={purpose.description}
 						purposes={purpose.purposes}
+						Purpose={Purpose}
 					/>
 				) : (
 					<PurposeContainer
-						t={t.purpose}
+						translations={translations.purpose}
 						purpose={purpose as PurposeType}
+						Purpose={Purpose}
 					/>
 				)
 			)}

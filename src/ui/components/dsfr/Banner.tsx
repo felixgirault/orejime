@@ -1,43 +1,32 @@
 import React from 'react';
-import type {BannerTranslations} from '../../types';
 import {template} from '../../utils/template';
+import type {BannerComponent} from '../types/Banner';
 
-interface BannerProps {
-	t: BannerTranslations;
-	isDirty: boolean;
-	isModalOpen: boolean;
-	privacyPolicyUrl: string;
-	onAccept: () => void;
-	onDecline: () => void;
-	onConfigure: () => void;
-}
-
-const Banner = ({
-	t,
+const Banner: BannerComponent = ({
+	translations: t,
+	commonTranslations: ct,
 	isDirty,
-	isModalOpen,
+	isHidden,
 	privacyPolicyUrl,
 	onAccept,
 	onDecline,
 	onConfigure
-}: BannerProps) => (
-	<div className="fr-consent-banner" aria-hidden={isModalOpen}>
+}) => (
+	<div className="fr-consent-banner" aria-hidden={isHidden}>
 		{t.title ? <h2 className="fr-h6">{t.title}</h2> : null}
 
 		<div className="fr-consent-banner__content">
 			<p className="fr-text--sm">
-				{t.description}
-
-				{template(t.privacyPolicy, {
+				{template(t.description, {
 					privacyPolicy: (
 						<a key="privacyPolicyUrl" href={privacyPolicyUrl}>
-							{t.privacyPolicyTitle}
+							{t.privacyPolicyLabel}
 						</a>
 					)
 				})}
 			</p>
 
-			{isDirty && <p className="fr-text--sm">{t.dirtyNotice}</p>}
+			{isDirty && <p className="fr-text--sm">{ct.changesNotice}</p>}
 		</div>
 
 		<ul className="fr-consent-banner__buttons fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-sm">

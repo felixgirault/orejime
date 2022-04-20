@@ -1,39 +1,22 @@
 import React, {useState} from 'react';
 import type {CSSProperties} from 'react';
-import {PurposeTranslations} from '../../types';
+import {ConsentState} from '../types/ConsentState';
+import type {PurposeComponent} from '../types/Purpose';
 
-export enum ConsentState {
-	accepted,
-	declined,
-	unknown
-}
-
-export interface PurposeProps {
-	t: PurposeTranslations;
-	name: string;
-	label: string;
-	description?: string;
-	isHeader?: boolean;
-	isAcceptable?: boolean;
-	isDeclinable?: boolean;
-	consent: ConsentState;
-	children?: any;
-	onChange: (consent: boolean) => void;
-}
-
-const Purpose = ({
-	t,
+const Purpose: PurposeComponent = ({
+	translations: t,
 	name,
 	label,
 	description,
 	isHeader = false,
-	isAcceptable = true,
-	isDeclinable = true,
+	isMandatory = false,
+	isOptOut = false,
 	consent,
 	children,
 	onChange
-}: PurposeProps) => {
+}) => {
 	const [isExpanded, setExpanded] = useState(false);
+	const id = `orejime-purpose-${name}`;
 
 	return (
 		<div
@@ -46,32 +29,38 @@ const Purpose = ({
 			<fieldset
 				className="fr-fieldset fr-fieldset--inline"
 				aria-labelledby={
-					description ? `${name}-legend ${name}-description` : null
+					description ? `${id}-legend ${id}-description` : null
 				}
 			>
-				<legend
-					id={`orejime-${name}-legend`}
-					className="fr-consent-service__title"
-				>
+				<legend id={`${id}-legend`} className="fr-consent-service__title">
 					{label}
-					{isDeclinable ? '' : ` ${t.mandatory}`}
+
+					{isMandatory ? (
+						<>
+							{' '}
+							<span title={t.mandatoryTitle}>{t.mandatory}</span>
+						</>
+					) : null}
+
+					{isOptOut ? (
+						<>
+							{' '}
+							<span title={t.optOutTitle}>{t.optOut}</span>
+						</>
+					) : null}
 				</legend>
 
 				<div className="fr-consent-service__radios fr-fieldset--inline">
 					<div className="fr-radio-group">
 						<input
 							type="radio"
-							id={`orejime-${name}-accept`}
+							id={`${id}-accept`}
 							name={name}
-							disabled={!isAcceptable}
 							checked={consent === ConsentState.accepted}
 							onChange={onChange.bind(null, true)}
 						/>
 
-						<label
-							className="fr-label"
-							htmlFor={`orejime-${name}-accept`}
-						>
+						<label className="fr-label" htmlFor={`${id}-accept`}>
 							{t.accept}
 						</label>
 					</div>
@@ -79,17 +68,14 @@ const Purpose = ({
 					<div className="fr-radio-group">
 						<input
 							type="radio"
-							id={`orejime-${name}-decline`}
+							id={`${id}-decline`}
 							name={name}
-							disabled={!isDeclinable}
+							disabled={isMandatory}
 							checked={consent === ConsentState.declined}
 							onChange={onChange.bind(null, false)}
 						/>
 
-						<label
-							className="fr-label"
-							htmlFor={`orejime-${name}-decline`}
-						>
+						<label className="fr-label" htmlFor={`${id}-decline`}>
 							{t.decline}
 						</label>
 					</div>
@@ -97,7 +83,7 @@ const Purpose = ({
 
 				{description ? (
 					<p
-						id={`orejime-${name}-description`}
+						id={`${id}-description`}
 						className="fr-consent-service__desc"
 						dangerouslySetInnerHTML={{
 							__html: description
@@ -122,7 +108,7 @@ const Purpose = ({
 						</div>
 
 						<div
-							id={`orejime-${name}-legend`}
+							id={`${id}-legend`}
 							className={
 								isExpanded
 									? 'fr-consent-services fr-collapse fr-collapse--expanded'

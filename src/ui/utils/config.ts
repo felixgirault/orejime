@@ -1,4 +1,16 @@
-import {Config, Purpose, PurposeList} from '../types';
+import type {Config, ImageDescriptor, Purpose, PurposeList} from '../types';
+import {language} from './i18n';
+
+export const DefaultConfig: Partial<Config> = {
+	orejimeElement: 'orejime',
+	stylePrefix: 'orejime',
+	defaultConsent: true,
+	forceConsent: false,
+	preventNavigation: false,
+	lang: language(),
+	purposes: [],
+	debug: false
+};
 
 export const validateConfig = (config: Config) => {
 	if (!Object.keys(config.purposes).length) {
@@ -18,8 +30,17 @@ export const purposesOnly = (purposes: PurposeList): Purpose[] =>
 			: [purpose as Purpose]
 	);
 
-export const getLogoUrl = (config: Config) =>
-	typeof config.logo == 'object' ? config.logo.src : (config.logo as string);
+export const imageAttributes = (image: ImageDescriptor) => {
+	if (typeof image === 'string') {
+		return {
+			src: image,
+			alt: ''
+		};
+	}
 
-export const getLogoAlternative = (config: Config) =>
-	typeof config.logo == 'object' && config.logo.alt ? config.logo.alt : '';
+	return {
+		src: '',
+		alt: '',
+		...image
+	};
+};

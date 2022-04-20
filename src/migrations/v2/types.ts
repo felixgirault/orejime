@@ -84,7 +84,6 @@ export interface V2Config {
 	default: boolean;
 	mustConsent: boolean;
 	mustNotice: boolean;
-	noNotice: boolean;
 	logo: boolean;
 	lang: string;
 	translations: Record<string, V2Translations>;

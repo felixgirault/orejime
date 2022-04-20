@@ -3,10 +3,12 @@ import {InstanceContext} from './InstanceContext';
 
 interface DeferredManagerProviderProps {
 	children: (commit: () => void) => JSX.Element;
+	onCommit: () => void;
 }
 
 export default function DeferredManagerProvider({
-	children
+	children,
+	onCommit
 }: DeferredManagerProviderProps) {
 	const {manager, ...context} = useContext(InstanceContext);
 
@@ -18,6 +20,7 @@ export default function DeferredManagerProvider({
 
 	const commit = () => {
 		manager.setConsents(deferred.getAllConsents());
+		onCommit();
 	};
 
 	return (

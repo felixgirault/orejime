@@ -15,22 +15,43 @@
 
 update preact / deps
 bundle with parcel
-  + move dist-site
+!  + move dist-site
   + scss
-  + typescript
-  + jest
   - check outputs
+  + doc
+  + typescript
+    + prettier
+  + jest
 add core
+  + remove --passWithNoTests
+  + remove HTMLElement.attr ??
+
+!  + doc
+
+RENAME purpose -> core, purposegroup -> purpose ?
+
 rewrite standard
+  + remove NS classnames
   + migrate config
   + migrate translations
   + ambient.d.ts
 split chunks
+  + parcelrc
+  + doc
 split translations
+  + doc
 add dsfr
   + html
+  + doc
 add migrations
   + html
+  + doc
+
+doc
+  + specify ids should be dom compatible
+
+husky ?
+check npm pack
 
 # Done
 

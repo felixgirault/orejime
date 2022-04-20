@@ -1,5 +1,5 @@
-import {Config, Purpose, PurposeList, Translations} from '../../ui';
-import {V2App, V2Category, V2Config, V2Translations} from '../v2/types';
+import type {Config, Purpose, PurposeList, Translations} from '../../ui';
+import type {V2App, V2Category, V2Config, V2Translations} from '../v2/types';
 
 export const migrateTranslations = (
 	translations: Partial<V2Translations>
@@ -7,19 +7,19 @@ export const migrateTranslations = (
 	return {
 		banner: {
 			title: translations?.consentNotice?.title,
-			description: translations?.consentNotice?.description,
-			privacyPolicy: translations?.consentModal?.privacyPolicy?.text,
-			privacyPolicyTitle: translations?.consentModal?.privacyPolicy?.name,
+			description: `${translations?.consentNotice?.description} ${translations?.consentNotice?.privacyPolicy?.text}`,
+			privacyPolicyLabel: translations?.consentNotice?.privacyPolicy?.name,
 			accept: translations?.accept,
 			acceptTitle: translations?.acceptTitle,
 			decline: translations?.decline,
 			declineTitle: translations?.decline,
 			configure: translations?.consentNotice?.learnMore,
-			configureTitle: translations?.consentNotice?.learnMore,
-			dirtyNotice: translations?.consentNotice?.changeDescription
+			configureTitle: translations?.consentNotice?.learnMore
 		},
 		modal: {
 			title: translations?.consentModal?.title,
+			description: `${translations?.consentModal?.description} ${translations?.consentModal?.privacyPolicy?.text}`,
+			privacyPolicyLabel: translations?.consentModal?.privacyPolicy?.name,
 			close: translations?.close,
 			closeTitle: translations?.close,
 			globalPreferences: undefined,
@@ -33,9 +33,14 @@ export const migrateTranslations = (
 		purpose: {
 			mandatory: translations?.app?.required?.title,
 			mandatoryTitle: translations?.app?.required?.description,
+			optOut: translations?.app?.optOut?.title,
+			optOutTitle: translations?.app?.optOut?.description,
 			showMore: undefined,
 			accept: translations?.accept,
 			decline: translations?.decline
+		},
+		common: {
+			changesNotice: translations?.consentNotice?.changeDescription
 		}
 	};
 };
@@ -97,8 +102,7 @@ export const migrateConfig = (config: V2Config): Config => {
 		lang: config?.lang,
 		logo: config?.logo,
 		forceConsent: config?.mustConsent,
-		forceNotice: config?.mustNotice,
-		noBanner: config?.noNotice,
+		preventNavigation: config?.mustNotice,
 		privacyPolicyUrl: config?.privacyPolicy,
 		stylePrefix: config?.stylePrefix,
 		cookie: {

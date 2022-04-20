@@ -1,4 +1,4 @@
-import {ElementReference} from '../types';
+import type {ElementReference} from '../types';
 
 export const getElement = (
 	reference: ElementReference,

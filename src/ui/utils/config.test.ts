@@ -1,4 +1,4 @@
-import {Purpose, PurposeList} from '../types';
+import type {Purpose, PurposeList} from '../types';
 import {purposesOnly} from './config';
 
 test('purposesOnly', () => {
